@@ -53,15 +53,13 @@ export default function RegistracijaClient() {
 
       const { data, error } = await supabase
         .from("darbai")
-        .select(
-          `
+        .select(`
           id,
           pavadinimas,
           miestas,
           atlyginimas,
           aprasymas
-        `
-        )
+        `)
         .eq("id", darbasId)
         .eq("aktyvus", true)
         .maybeSingle();
@@ -105,7 +103,6 @@ export default function RegistracijaClient() {
     }
 
     const extension = file.name.split(".").pop()?.toLowerCase();
-
     const allowedExtensions = ["pdf", "doc", "docx"];
 
     if (!extension || !allowedExtensions.includes(extension)) {
@@ -134,9 +131,7 @@ export default function RegistracijaClient() {
     setCv(file);
   }
 
-  async function handleSubmit(
-    e: FormEvent<HTMLFormElement>
-  ) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setErrorMessage("");
@@ -182,18 +177,6 @@ export default function RegistracijaClient() {
       return;
     }
 
-    if (!cv) {
-      setErrorMessage("Pridėkite CV.");
-      return;
-    }
-
-    const cvValidationError = validateCv(cv);
-
-    if (cvValidationError) {
-      setErrorMessage(cvValidationError);
-      return;
-    }
-
     if (!sutinkuPrivatumas) {
       setErrorMessage(
         "Patvirtinkite, kad susipažinote su privatumo politika."
@@ -213,32 +196,40 @@ export default function RegistracijaClient() {
     let uploadedCvPath: string | null = null;
 
     try {
-      const safeFileName = sanitizeFileName(cv.name);
+      let cvPath: string | null = null;
 
-      const randomPart =
-        typeof crypto !== "undefined" &&
-        typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : `${Date.now()}-${Math.random()
-              .toString(36)
-              .slice(2)}`;
+      if (cv) {
+        const cvValidationError = validateCv(cv);
 
-      const cvPath = `${randomPart}-${safeFileName}`;
+        if (cvValidationError) {
+          throw new Error(cvValidationError);
+        }
 
-      const { error: uploadError } = await supabase.storage
-        .from("cv")
-        .upload(cvPath, cv, {
-          cacheControl: "3600",
-          upsert: false,
-        });
+        const safeFileName = sanitizeFileName(cv.name);
 
-      if (uploadError) {
-        throw new Error(
-          `Nepavyko įkelti CV: ${uploadError.message}`
-        );
+        const randomPart =
+          typeof crypto !== "undefined" &&
+          typeof crypto.randomUUID === "function"
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+        cvPath = `${randomPart}-${safeFileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("cv")
+          .upload(cvPath, cv, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw new Error(
+            `Nepavyko įkelti CV: ${uploadError.message}`
+          );
+        }
+
+        uploadedCvPath = cvPath;
       }
-
-      uploadedCvPath = cvPath;
 
       const { error: insertError } = await supabase
         .from("kandidatai")
@@ -272,9 +263,7 @@ export default function RegistracijaClient() {
         );
       }
 
-      setSuccessMessage(
-        "Kandidatūra sėkmingai pateikta."
-      );
+      setSuccessMessage("Kandidatūra sėkmingai pateikta.");
 
       setVardas("");
       setPavarde("");
@@ -343,8 +332,8 @@ export default function RegistracijaClient() {
             </h1>
 
             <p className="mt-3 leading-7 text-slate-600">
-              Užpildykite anketą ir pridėkite savo CV.
-              Kandidatūros pateikimas yra nemokamas.
+              Užpildykite kandidato anketą. Jei turite CV, galite jį
+              pridėti. Kandidatūros pateikimas yra nemokamas.
             </p>
           </div>
 
@@ -388,10 +377,7 @@ export default function RegistracijaClient() {
             </div>
           )}
 
-          <form
-            onSubmit={handleSubmit}
-            className="mt-8 space-y-7"
-          >
+          <form onSubmit={handleSubmit} className="mt-8 space-y-7">
             <div className="grid gap-5 md:grid-cols-2">
               <div>
                 <label className="mb-2 block font-semibold text-slate-700">
@@ -402,9 +388,7 @@ export default function RegistracijaClient() {
                   type="text"
                   required
                   value={vardas}
-                  onChange={(e) =>
-                    setVardas(e.target.value)
-                  }
+                  onChange={(e) => setVardas(e.target.value)}
                   autoComplete="given-name"
                   className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
                 />
@@ -419,9 +403,7 @@ export default function RegistracijaClient() {
                   type="text"
                   required
                   value={pavarde}
-                  onChange={(e) =>
-                    setPavarde(e.target.value)
-                  }
+                  onChange={(e) => setPavarde(e.target.value)}
                   autoComplete="family-name"
                   className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
                 />
@@ -436,9 +418,7 @@ export default function RegistracijaClient() {
                   type="tel"
                   required
                   value={telefonas}
-                  onChange={(e) =>
-                    setTelefonas(e.target.value)
-                  }
+                  onChange={(e) => setTelefonas(e.target.value)}
                   autoComplete="tel"
                   placeholder="+370..."
                   className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
@@ -454,9 +434,7 @@ export default function RegistracijaClient() {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) =>
-                    setEmail(e.target.value)
-                  }
+                  onChange={(e) => setEmail(e.target.value)}
                   autoComplete="email"
                   className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
                 />
@@ -471,14 +449,10 @@ export default function RegistracijaClient() {
               <select
                 required
                 value={profesija}
-                onChange={(e) =>
-                  setProfesija(e.target.value)
-                }
+                onChange={(e) => setProfesija(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-slate-500"
               >
-                <option value="">
-                  Pasirinkite profesiją
-                </option>
+                <option value="">Pasirinkite profesiją</option>
                 <option value="Stalius">Stalius</option>
                 <option value="Betonuotojas">Betonuotojas</option>
                 <option value="Elektrikas">Elektrikas</option>
@@ -499,9 +473,7 @@ export default function RegistracijaClient() {
               <select
                 required
                 value={patirtis}
-                onChange={(e) =>
-                  setPatirtis(e.target.value)
-                }
+                onChange={(e) => setPatirtis(e.target.value)}
                 className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-slate-500"
               >
                 <option value="">Pasirinkite</option>
@@ -524,9 +496,7 @@ export default function RegistracijaClient() {
                 <select
                   required
                   value={norveguKalba}
-                  onChange={(e) =>
-                    setNorveguKalba(e.target.value)
-                  }
+                  onChange={(e) => setNorveguKalba(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-slate-500"
                 >
                   <option value="">Pasirinkite</option>
@@ -546,9 +516,7 @@ export default function RegistracijaClient() {
                 <select
                   required
                   value={angluKalba}
-                  onChange={(e) =>
-                    setAngluKalba(e.target.value)
-                  }
+                  onChange={(e) => setAngluKalba(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-slate-500"
                 >
                   <option value="">Pasirinkite</option>
@@ -569,9 +537,7 @@ export default function RegistracijaClient() {
               <textarea
                 rows={5}
                 value={apie}
-                onChange={(e) =>
-                  setApie(e.target.value)
-                }
+                onChange={(e) => setApie(e.target.value)}
                 placeholder="Trumpai aprašykite savo darbo patirtį, kvalifikaciją ar kitą svarbią informaciją."
                 className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
               />
@@ -582,24 +548,21 @@ export default function RegistracijaClient() {
                 htmlFor="cv"
                 className="mb-2 block font-semibold text-slate-700"
               >
-                CV *
+                CV
               </label>
 
               <input
                 id="cv"
                 type="file"
-                required
                 accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 onChange={(e) =>
-                  handleCvChange(
-                    e.target.files?.[0] || null
-                  )
+                  handleCvChange(e.target.files?.[0] || null)
                 }
                 className="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3"
               />
 
               <p className="mt-2 text-sm text-slate-500">
-                PDF, DOC arba DOCX. Maksimalus dydis – 10 MB.
+                Neprivaloma. PDF, DOC arba DOCX. Maksimalus dydis – 10 MB.
               </p>
 
               {cv && (
@@ -646,12 +609,11 @@ export default function RegistracijaClient() {
                 />
 
                 <span className="text-sm leading-6 text-slate-600">
-                  Sutinku, kad mano pateikti kandidatūros
-                  duomenys ir CV būtų naudojami kandidatūros
-                  administravimui ir galėtų būti perduoti
-                  potencialiems darbdaviams dėl mano pasirinktos
-                  arba mano kvalifikaciją atitinkančios darbo
-                  pozicijos.
+                  Sutinku, kad mano pateikti kandidatūros duomenys ir,
+                  jei pateiktas, CV būtų naudojami kandidatūros
+                  administravimui ir galėtų būti perduoti potencialiems
+                  darbdaviams dėl mano pasirinktos arba mano
+                  kvalifikaciją atitinkančios darbo pozicijos.
                 </span>
               </label>
             </div>
@@ -661,9 +623,7 @@ export default function RegistracijaClient() {
               disabled={loading}
               className="w-full rounded-xl bg-slate-950 px-6 py-4 font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading
-                ? "Pateikiama..."
-                : "Pateikti kandidatūrą"}
+              {loading ? "Pateikiama..." : "Pateikti kandidatūrą"}
             </button>
 
             <p className="text-center text-sm text-slate-500">
