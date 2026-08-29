@@ -70,13 +70,20 @@ export default function AdminPage() {
   const [filtras, setFiltras] = useState<Filtras>("Nauji");
   const [paieska, setPaieska] = useState("");
 
+  const [pazymetiKandidatai, setPazymetiKandidatai] =
+    useState<Set<number>>(new Set());
+
   const [naujasPavadinimas, setNaujasPavadinimas] = useState("");
   const [naujasMiestas, setNaujasMiestas] = useState("");
   const [naujasAtlyginimas, setNaujasAtlyginimas] = useState("");
   const [naujasAprasymas, setNaujasAprasymas] = useState("");
-  const [naujasDarbdavioEmail, setNaujasDarbdavioEmail] = useState("");
+  const [naujasDarbdavioEmail, setNaujasDarbdavioEmail] =
+    useState("");
 
   const [jobLoading, setJobLoading] = useState(false);
+  const [changingJobId, setChangingJobId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     async function checkUser() {
@@ -154,6 +161,7 @@ export default function AdminPage() {
     setUserEmail(null);
     setKandidatai([]);
     setDarbai([]);
+    setPazymetiKandidatai(new Set());
   }
 
   async function loadCandidates() {
@@ -195,6 +203,7 @@ export default function AdminPage() {
     }
 
     setKandidatai((data || []) as unknown as Kandidatas[]);
+    setPazymetiKandidatai(new Set());
   }
 
   async function loadJobs() {
@@ -204,11 +213,11 @@ export default function AdminPage() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Nepavyko gauti darbų:", error);
+      alert(`Nepavyko gauti darbų: ${error.message}`);
       return;
     }
 
-    setDarbai(data || []);
+    setDarbai((data || []) as Darbas[]);
   }
 
   async function updateCandidateStatus(
@@ -237,20 +246,7 @@ export default function AdminPage() {
       return;
     }
 
-    setKandidatai((current) =>
-      current.map((kandidatas) =>
-        kandidatas.id === id
-          ? {
-              ...kandidatas,
-              statusas,
-              issiusta_darbdaviui_at:
-                statusas === "Išsiųstas darbdaviui"
-                  ? updateData.issiusta_darbdaviui_at || null
-                  : kandidatas.issiusta_darbdaviui_at,
-            }
-          : kandidatas
-      )
-    );
+    await loadCandidates();
   }
 
   async function markAsSent(id: number) {
@@ -258,9 +254,7 @@ export default function AdminPage() {
       "Ar tikrai jau išsiuntėte šio kandidato anketą darbdaviui?"
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     await updateCandidateStatus(
       id,
@@ -281,19 +275,7 @@ export default function AdminPage() {
 
     if (error) {
       alert(`Nepavyko išsaugoti pastabų: ${error.message}`);
-      return;
     }
-
-    setKandidatai((current) =>
-      current.map((kandidatas) =>
-        kandidatas.id === id
-          ? {
-              ...kandidatas,
-              admin_pastabos: adminPastabos,
-            }
-          : kandidatas
-      )
-    );
   }
 
   async function openCv(cvPath: string | null) {
@@ -318,6 +300,66 @@ export default function AdminPage() {
     window.open(data.signedUrl, "_blank");
   }
 
+  function toggleCandidate(id: number) {
+    setPazymetiKandidatai((current) => {
+      const next = new Set(current);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  }
+
+  async function deleteCandidates(ids: number[]) {
+    if (ids.length === 0) return;
+
+    const confirmed = window.confirm(
+      ids.length === 1
+        ? "Ar tikrai norite ištrinti šią kandidato anketą?"
+        : `Ar tikrai norite ištrinti ${ids.length} pažymėtas kandidatų anketas?`
+    );
+
+    if (!confirmed) return;
+
+    const candidatesToDelete = kandidatai.filter((kandidatas) =>
+      ids.includes(kandidatas.id)
+    );
+
+    const { error } = await supabase
+      .from("kandidatai")
+      .delete()
+      .in("id", ids);
+
+    if (error) {
+      alert(`Nepavyko ištrinti kandidatų: ${error.message}`);
+      return;
+    }
+
+    const cvPaths = candidatesToDelete
+      .map((kandidatas) => kandidatas.cv_path)
+      .filter((path): path is string => Boolean(path));
+
+    if (cvPaths.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from("cv")
+        .remove(cvPaths);
+
+      if (storageError) {
+        console.warn(
+          "Anketos ištrintos, bet nepavyko pašalinti kai kurių CV failų.",
+          storageError
+        );
+      }
+    }
+
+    setPazymetiKandidatai(new Set());
+    await loadCandidates();
+  }
+
   async function addJob(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -330,7 +372,8 @@ export default function AdminPage() {
         miestas: naujasMiestas.trim(),
         atlyginimas: naujasAtlyginimas.trim() || null,
         aprasymas: naujasAprasymas.trim() || null,
-        darbdavio_email: naujasDarbdavioEmail.trim() || null,
+        darbdavio_email:
+          naujasDarbdavioEmail.trim() || null,
         aktyvus: true,
       });
 
@@ -375,22 +418,25 @@ export default function AdminPage() {
       .eq("id", id);
 
     if (error) {
-      alert(
-        `Nepavyko atnaujinti darbo: ${error.message}`
-      );
-      return;
+      alert(`Nepavyko atnaujinti darbo: ${error.message}`);
+      await loadJobs();
+      return false;
     }
 
-    setDarbai((current) =>
-      current.map((darbas) =>
-        darbas.id === id
-          ? {
-              ...darbas,
-              [field]: value,
-            }
-          : darbas
-      )
+    await loadJobs();
+    return true;
+  }
+
+  async function toggleJobActive(darbas: Darbas) {
+    setChangingJobId(darbas.id);
+
+    await updateJob(
+      darbas.id,
+      "aktyvus",
+      !darbas.aktyvus
     );
+
+    setChangingJobId(null);
   }
 
   async function deleteJob(id: number) {
@@ -398,9 +444,7 @@ export default function AdminPage() {
       "Ar tikrai norite ištrinti šį darbo pasiūlymą?"
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     const { error } = await supabase
       .from("darbai")
@@ -408,17 +452,11 @@ export default function AdminPage() {
       .eq("id", id);
 
     if (error) {
-      alert(
-        `Nepavyko ištrinti darbo: ${error.message}`
-      );
+      alert(`Nepavyko ištrinti darbo: ${error.message}`);
       return;
     }
 
-    setDarbai((current) =>
-      current.filter(
-        (darbas) => darbas.id !== id
-      )
-    );
+    await loadJobs();
   }
 
   const filteredCandidates = useMemo(() => {
@@ -426,37 +464,31 @@ export default function AdminPage() {
 
     if (filtras === "Nauji") {
       result = result.filter(
-        (k) =>
-          !k.statusas ||
-          k.statusas === "Naujas"
+        (k) => !k.statusas || k.statusas === "Naujas"
       );
     }
 
     if (filtras === "Išsiųsti") {
       result = result.filter(
-        (k) =>
-          k.statusas === "Išsiųstas darbdaviui"
+        (k) => k.statusas === "Išsiųstas darbdaviui"
       );
     }
 
     if (filtras === "Pokalbis") {
       result = result.filter(
-        (k) =>
-          k.statusas === "Pokalbis"
+        (k) => k.statusas === "Pokalbis"
       );
     }
 
     if (filtras === "Įdarbinti") {
       result = result.filter(
-        (k) =>
-          k.statusas === "Įdarbintas"
+        (k) => k.statusas === "Įdarbintas"
       );
     }
 
     if (filtras === "Atmesti") {
       result = result.filter(
-        (k) =>
-          k.statusas === "Atmestas"
+        (k) => k.statusas === "Atmestas"
       );
     }
 
@@ -484,15 +516,36 @@ export default function AdminPage() {
     return result;
   }, [kandidatai, filtras, paieska]);
 
+  const allVisibleSelected =
+    filteredCandidates.length > 0 &&
+    filteredCandidates.every((kandidatas) =>
+      pazymetiKandidatai.has(kandidatas.id)
+    );
+
+  function toggleAllVisible() {
+    setPazymetiKandidatai((current) => {
+      const next = new Set(current);
+
+      if (allVisibleSelected) {
+        filteredCandidates.forEach((kandidatas) =>
+          next.delete(kandidatas.id)
+        );
+      } else {
+        filteredCandidates.forEach((kandidatas) =>
+          next.add(kandidatas.id)
+        );
+      }
+
+      return next;
+    });
+  }
+
   const newCount = kandidatai.filter(
-    (k) =>
-      !k.statusas ||
-      k.statusas === "Naujas"
+    (k) => !k.statusas || k.statusas === "Naujas"
   ).length;
 
   const sentCount = kandidatai.filter(
-    (k) =>
-      k.statusas === "Išsiųstas darbdaviui"
+    (k) => k.statusas === "Išsiųstas darbdaviui"
   ).length;
 
   if (loading) {
@@ -589,6 +642,7 @@ export default function AdminPage() {
           </div>
 
           <button
+            type="button"
             onClick={handleLogout}
             className="rounded-lg border border-slate-700 px-4 py-2 font-semibold hover:bg-slate-800"
           >
@@ -644,11 +698,13 @@ export default function AdminPage() {
               </h2>
 
               <p className="mt-2 text-slate-600">
-                Naujos anketos rodomos atskirai, kol jų nepažymėsite kaip išsiųstų.
+                Kandidatus galite pažymėti, pakeisti jų statusą
+                arba ištrinti.
               </p>
             </div>
 
             <button
+              type="button"
               onClick={loadCandidates}
               className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold hover:bg-slate-50"
             >
@@ -669,6 +725,7 @@ export default function AdminPage() {
                 ] as Filtras[]
               ).map((item) => (
                 <button
+                  type="button"
                   key={item}
                   onClick={() => setFiltras(item)}
                   className={`rounded-lg px-4 py-2 font-semibold ${
@@ -685,12 +742,36 @@ export default function AdminPage() {
             <input
               type="text"
               value={paieska}
-              onChange={(e) =>
-                setPaieska(e.target.value)
-              }
+              onChange={(e) => setPaieska(e.target.value)}
               placeholder="Ieškoti pagal vardą, el. paštą, profesiją, miestą..."
               className="mt-5 w-full rounded-lg border border-slate-300 px-4 py-3"
             />
+
+            <div className="mt-5 flex flex-wrap items-center gap-4 border-t border-slate-200 pt-5">
+              <label className="flex items-center gap-2 font-semibold">
+                <input
+                  type="checkbox"
+                  checked={allVisibleSelected}
+                  onChange={toggleAllVisible}
+                  className="h-5 w-5"
+                />
+
+                Pažymėti visus rodomus
+              </label>
+
+              <button
+                type="button"
+                disabled={pazymetiKandidatai.size === 0}
+                onClick={() =>
+                  deleteCandidates(
+                    Array.from(pazymetiKandidatai)
+                  )
+                }
+                className="rounded-lg border border-red-300 px-4 py-2 font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Ištrinti pažymėtas ({pazymetiKandidatai.size})
+              </button>
+            </div>
           </div>
 
           {errorMessage && (
@@ -721,59 +802,79 @@ export default function AdminPage() {
                   }`}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-5">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-3">
-                        <h3 className="text-2xl font-bold text-slate-900">
-                          {kandidatas.vardas} {kandidatas.pavarde}
-                        </h3>
-
-                        {yraNaujas && (
-                          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-800">
-                            Nauja
-                          </span>
+                    <div className="flex items-start gap-4">
+                      <input
+                        type="checkbox"
+                        checked={pazymetiKandidatai.has(
+                          kandidatas.id
                         )}
-                      </div>
+                        onChange={() =>
+                          toggleCandidate(kandidatas.id)
+                        }
+                        className="mt-2 h-5 w-5"
+                      />
 
-                      <p className="mt-2 text-slate-600">
-                        Kandidatūra gauta:{" "}
-                        {new Date(
-                          kandidatas.created_at
-                        ).toLocaleString("lt-LT")}
-                      </p>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-3">
+                          <h3 className="text-2xl font-bold text-slate-900">
+                            {kandidatas.vardas}{" "}
+                            {kandidatas.pavarde}
+                          </h3>
+
+                          {yraNaujas && (
+                            <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-800">
+                              Nauja
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="mt-2 text-slate-600">
+                          Kandidatūra gauta:{" "}
+                          {new Date(
+                            kandidatas.created_at
+                          ).toLocaleString("lt-LT")}
+                        </p>
+                      </div>
                     </div>
 
-                    <select
-                      value={
-                        kandidatas.statusas || "Naujas"
-                      }
-                      onChange={(e) =>
-                        updateCandidateStatus(
-                          kandidatas.id,
-                          e.target.value
-                        )
-                      }
-                      className="rounded-lg border border-slate-300 bg-white px-4 py-3 font-semibold"
-                    >
-                      <option value="Naujas">
-                        Naujas
-                      </option>
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase text-slate-500">
+                        Statusas
+                      </label>
 
-                      <option value="Išsiųstas darbdaviui">
-                        Išsiųstas darbdaviui
-                      </option>
+                      <select
+                        value={
+                          kandidatas.statusas || "Naujas"
+                        }
+                        onChange={(e) =>
+                          updateCandidateStatus(
+                            kandidatas.id,
+                            e.target.value
+                          )
+                        }
+                        className="rounded-lg border border-slate-300 bg-white px-4 py-3 font-semibold"
+                      >
+                        <option value="Naujas">
+                          Naujas
+                        </option>
 
-                      <option value="Pokalbis">
-                        Pokalbis
-                      </option>
+                        <option value="Išsiųstas darbdaviui">
+                          Išsiųstas darbdaviui
+                        </option>
 
-                      <option value="Įdarbintas">
-                        Įdarbintas
-                      </option>
+                        <option value="Pokalbis">
+                          Pokalbis
+                        </option>
 
-                      <option value="Atmestas">
-                        Atmestas
-                      </option>
-                    </select>
+                        <option value="Įdarbintas">
+                          Įdarbintas
+                        </option>
+
+                        <option value="Atmestas">
+                          Atmestas
+                        </option>
+                      </select>
+                    </div>
                   </div>
 
                   {kandidatas.darbai && (
@@ -806,7 +907,10 @@ export default function AdminPage() {
                             href={`mailto:${kandidatas.darbai.darbdavio_email}`}
                             className="mt-1 inline-block font-semibold text-sky-700 underline"
                           >
-                            {kandidatas.darbai.darbdavio_email}
+                            {
+                              kandidatas.darbai
+                                .darbdavio_email
+                            }
                           </a>
                         ) : (
                           <p className="mt-1 text-red-600">
@@ -897,30 +1001,23 @@ export default function AdminPage() {
                     </div>
                   )}
 
-                  {kandidatas.issiusta_darbdaviui_at && (
-                    <div className="mt-6 rounded-lg bg-green-50 p-4 text-sm text-green-800">
-                      Pažymėta kaip išsiųsta darbdaviui:{" "}
-                      <strong>
-                        {new Date(
-                          kandidatas.issiusta_darbdaviui_at
-                        ).toLocaleString("lt-LT")}
-                      </strong>
-                    </div>
-                  )}
-
                   <div className="mt-6 flex flex-wrap gap-3">
                     <button
+                      type="button"
                       onClick={() =>
                         openCv(kandidatas.cv_path)
                       }
                       disabled={!kandidatas.cv_path}
                       className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      Atidaryti CV
+                      {kandidatas.cv_path
+                        ? "Atidaryti CV"
+                        : "CV nepridėtas"}
                     </button>
 
                     {yraNaujas && (
                       <button
+                        type="button"
                         onClick={() =>
                           markAsSent(kandidatas.id)
                         }
@@ -929,6 +1026,18 @@ export default function AdminPage() {
                         Pažymėti kaip išsiųstą
                       </button>
                     )}
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        deleteCandidates([
+                          kandidatas.id,
+                        ])
+                      }
+                      className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 hover:bg-red-50"
+                    >
+                      Ištrinti anketą
+                    </button>
                   </div>
 
                   <div className="mt-6 border-t border-slate-200 pt-6">
@@ -947,7 +1056,7 @@ export default function AdminPage() {
                           e.target.value
                         )
                       }
-                      placeholder="Pvz. išsiųsta ABC AS, laukiamas atsakymas..."
+                      placeholder="Pvz. išsiųsta darbdaviui, laukiamas atsakymas..."
                       className="w-full rounded-lg border border-slate-300 px-4 py-3"
                     />
                   </div>
@@ -1004,7 +1113,9 @@ export default function AdminPage() {
                 type="email"
                 value={naujasDarbdavioEmail}
                 onChange={(e) =>
-                  setNaujasDarbdavioEmail(e.target.value)
+                  setNaujasDarbdavioEmail(
+                    e.target.value
+                  )
                 }
                 placeholder="Darbdavio el. paštas"
                 className="rounded-lg border px-4 py-3"
@@ -1016,6 +1127,7 @@ export default function AdminPage() {
                   setNaujasAprasymas(e.target.value)
                 }
                 placeholder="Darbo aprašymas"
+                rows={5}
                 className="rounded-lg border px-4 py-3 md:col-span-2"
               />
             </div>
@@ -1037,6 +1149,41 @@ export default function AdminPage() {
                 key={darbas.id}
                 className="rounded-2xl bg-white p-6 shadow-sm"
               >
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                  <span
+                    className={`inline-flex rounded-full px-3 py-1 text-sm font-bold ${
+                      darbas.aktyvus
+                        ? "bg-green-100 text-green-800"
+                        : "bg-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {darbas.aktyvus
+                      ? "AKTYVUS"
+                      : "NEAKTYVUS"}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={
+                      changingJobId === darbas.id
+                    }
+                    onClick={() =>
+                      toggleJobActive(darbas)
+                    }
+                    className={`rounded-lg px-4 py-2 font-bold text-white disabled:opacity-50 ${
+                      darbas.aktyvus
+                        ? "bg-amber-600 hover:bg-amber-700"
+                        : "bg-green-700 hover:bg-green-800"
+                    }`}
+                  >
+                    {changingJobId === darbas.id
+                      ? "Keičiama..."
+                      : darbas.aktyvus
+                      ? "Padaryti neaktyvų"
+                      : "Padaryti aktyvų"}
+                  </button>
+                </div>
+
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-slate-600">
@@ -1044,12 +1191,12 @@ export default function AdminPage() {
                     </label>
 
                     <input
-                      value={darbas.pavadinimas}
-                      onChange={(e) =>
+                      defaultValue={darbas.pavadinimas}
+                      onBlur={(e) =>
                         updateJob(
                           darbas.id,
                           "pavadinimas",
-                          e.target.value
+                          e.target.value.trim()
                         )
                       }
                       className="w-full rounded-lg border px-4 py-3"
@@ -1062,12 +1209,12 @@ export default function AdminPage() {
                     </label>
 
                     <input
-                      value={darbas.miestas}
-                      onChange={(e) =>
+                      defaultValue={darbas.miestas}
+                      onBlur={(e) =>
                         updateJob(
                           darbas.id,
                           "miestas",
-                          e.target.value
+                          e.target.value.trim()
                         )
                       }
                       className="w-full rounded-lg border px-4 py-3"
@@ -1080,12 +1227,15 @@ export default function AdminPage() {
                     </label>
 
                     <input
-                      value={darbas.atlyginimas || ""}
-                      onChange={(e) =>
+                      defaultValue={
+                        darbas.atlyginimas || ""
+                      }
+                      onBlur={(e) =>
                         updateJob(
                           darbas.id,
                           "atlyginimas",
-                          e.target.value || null
+                          e.target.value.trim() ||
+                            null
                         )
                       }
                       className="w-full rounded-lg border px-4 py-3"
@@ -1099,12 +1249,15 @@ export default function AdminPage() {
 
                     <input
                       type="email"
-                      value={darbas.darbdavio_email || ""}
-                      onChange={(e) =>
+                      defaultValue={
+                        darbas.darbdavio_email || ""
+                      }
+                      onBlur={(e) =>
                         updateJob(
                           darbas.id,
                           "darbdavio_email",
-                          e.target.value || null
+                          e.target.value.trim() ||
+                            null
                         )
                       }
                       placeholder="firma@darbdavys.no"
@@ -1118,39 +1271,24 @@ export default function AdminPage() {
                     </label>
 
                     <textarea
-                      value={darbas.aprasymas || ""}
-                      onChange={(e) =>
+                      defaultValue={
+                        darbas.aprasymas || ""
+                      }
+                      onBlur={(e) =>
                         updateJob(
                           darbas.id,
                           "aprasymas",
-                          e.target.value || null
+                          e.target.value.trim() ||
+                            null
                         )
                       }
-                      rows={4}
+                      rows={5}
                       className="w-full rounded-lg border px-4 py-3"
                     />
                   </div>
                 </div>
 
-                <div className="mt-5 flex flex-wrap items-center gap-5">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={darbas.aktyvus}
-                      onChange={(e) =>
-                        updateJob(
-                          darbas.id,
-                          "aktyvus",
-                          e.target.checked
-                        )
-                      }
-                    />
-
-                    <span className="font-semibold">
-                      Aktyvus
-                    </span>
-                  </label>
-
+                <div className="mt-5">
                   <button
                     type="button"
                     onClick={() =>
@@ -1158,7 +1296,7 @@ export default function AdminPage() {
                     }
                     className="rounded-lg border border-red-300 px-4 py-2 font-semibold text-red-700 hover:bg-red-50"
                   >
-                    Ištrinti
+                    Ištrinti darbo pasiūlymą
                   </button>
                 </div>
               </div>
