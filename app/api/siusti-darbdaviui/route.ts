@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+import * as XLSX from "xlsx";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
@@ -10,6 +12,21 @@ export async function POST(request: NextRequest) {
 
     const supabaseServiceRoleKey =
       process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    const smtpHost =
+      process.env.SMTP_HOST;
+
+    const smtpPort =
+      Number(process.env.SMTP_PORT || 465);
+
+    const smtpSecure =
+      process.env.SMTP_SECURE === "true";
+
+    const smtpUser =
+      process.env.SMTP_USER;
+
+    const smtpPassword =
+      process.env.SMTP_PASSWORD;
 
     if (!supabaseUrl) {
       return NextResponse.json(
@@ -29,13 +46,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!smtpHost || !smtpUser || !smtpPassword) {
+      return NextResponse.json(
+        {
+          error:
+            "Trūksta SMTP nustatymų Vercel Environment Variables.",
+        },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
 
     const kandidatIds =
-      body.kandidatIds || [];
+      body.kandidatIds as number[];
 
     const darbdavioEmail =
-      body.darbdavioEmail || null;
+      body.darbdavioEmail as string;
+
+    if (
+      !Array.isArray(kandidatIds) ||
+      kandidatIds.length === 0
+    ) {
+      return NextResponse.json(
+        {
+          error: "Nepasirinkti kandidatai.",
+        },
+        { status: 400 }
+      );
+    }
+
+    if (
+      !darbdavioEmail ||
+      typeof darbdavioEmail !== "string"
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Nenurodytas darbdavio el. paštas.",
+        },
+        { status: 400 }
+      );
+    }
 
     const supabase = createClient(
       supabaseUrl,
@@ -48,98 +100,194 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // 1. Tikriname visus kandidatus
     const {
-      data: visiKandidatai,
-      error: visiError,
+      data: kandidatai,
+      error: kandidataiError,
     } = await supabase
       .from("kandidatai")
-      .select("id, vardas, pavarde")
-      .order("id", {
-        ascending: true,
-      });
-
-    // 2. Tikriname būtent pasirinktus ID
-    const {
-      data: pasirinktiKandidatai,
-      error: pasirinktiError,
-    } = await supabase
-      .from("kandidatai")
-      .select("id, vardas, pavarde")
+      .select(`
+        id,
+        vardas,
+        pavarde,
+        telefonas,
+        email,
+        profesija,
+        patirtis,
+        norvegu_kalba,
+        anglu_kalba,
+        apie
+      `)
       .in("id", kandidatIds);
 
-    console.log(
-      "===== NORGEWORKIS TESTAS ====="
+    if (kandidataiError) {
+      return NextResponse.json(
+        {
+          error:
+            "Nepavyko gauti kandidatų: " +
+            kandidataiError.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    if (!kandidatai || kandidatai.length === 0) {
+      return NextResponse.json(
+        {
+          error: "Kandidatų nerasta.",
+        },
+        { status: 404 }
+      );
+    }
+
+    const excelData =
+      kandidatai.map(
+        (kandidatas, index) => ({
+          "Nr.": index + 1,
+          Vardas:
+            kandidatas.vardas || "",
+          Pavardė:
+            kandidatas.pavarde || "",
+          Telefonas:
+            kandidatas.telefonas || "",
+          "El. paštas":
+            kandidatas.email || "",
+          Profesija:
+            kandidatas.profesija || "",
+          Patirtis:
+            kandidatas.patirtis || "",
+          "Norvegų kalba":
+            kandidatas.norvegu_kalba || "",
+          "Anglų kalba":
+            kandidatas.anglu_kalba || "",
+          "Apie kandidatą":
+            kandidatas.apie || "",
+        })
+      );
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(
+        excelData
+      );
+
+    worksheet["!cols"] = [
+      { wch: 6 },
+      { wch: 18 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 22 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 50 },
+    ];
+
+    const workbook =
+      XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Kandidatai"
     );
 
-    console.log(
-      "Supabase host:",
-      new URL(supabaseUrl).host
-    );
+    const excelBuffer =
+      XLSX.write(
+        workbook,
+        {
+          type: "buffer",
+          bookType: "xlsx",
+        }
+      );
+
+    const transporter =
+      nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpSecure,
+        auth: {
+          user: smtpUser,
+          pass: smtpPassword,
+        },
+      });
+
+    await transporter.verify();
+
+    const fileName =
+      `norgeworkis-kandidatai-${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`;
+
+    const info =
+      await transporter.sendMail({
+        from:
+          `"Norgeworkis" <${smtpUser}>`,
+
+        to: darbdavioEmail,
+
+        subject:
+          "Norgeworkis – atrinktų kandidatų sąrašas",
+
+        text:
+          "Sveiki,\n\n" +
+          `Prisegame atrinktų kandidatų sąrašą (${kandidatai.length}).\n\n` +
+          "Kandidatų informacija pateikta Excel faile.\n\n" +
+          "Pagarbiai,\n" +
+          "Norgeworkis\n" +
+          "www.norgeworkis.lt",
+
+        attachments: [
+          {
+            filename: fileName,
+            content: excelBuffer,
+            contentType:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          },
+        ],
+      });
 
     console.log(
-      "Gauti kandidatų ID:",
-      kandidatIds
+      "Laiškas išsiųstas. Message ID:",
+      info.messageId
     );
 
-    console.log(
-      "Darbdavio email:",
-      darbdavioEmail
-    );
+    const {
+      error: updateError,
+    } = await supabase
+      .from("kandidatai")
+      .update({
+        statusas:
+          "Išsiųstas darbdaviui",
 
-    console.log(
-      "Visų kandidatų klaida:",
-      visiError?.message || "nėra"
-    );
+        issiusta_darbdaviui_at:
+          new Date().toISOString(),
+      })
+      .in("id", kandidatIds);
 
-    console.log(
-      "Visi DB kandidatai:",
-      visiKandidatai || []
-    );
+    if (updateError) {
+      return NextResponse.json({
+        success: true,
 
-    console.log(
-      "Pasirinktų kandidatų klaida:",
-      pasirinktiError?.message || "nėra"
-    );
+        warning:
+          "Laiškas išsiųstas, tačiau statuso atnaujinti nepavyko.",
 
-    console.log(
-      "Rasti pasirinkti kandidatai:",
-      pasirinktiKandidatai || []
-    );
-
-    console.log(
-      "============================="
-    );
+        messageId:
+          info.messageId,
+      });
+    }
 
     return NextResponse.json({
       success: true,
 
-      diagnostics: {
-        supabaseHost:
-          new URL(supabaseUrl).host,
+      message:
+        `Excel failas išsiųstas adresu ${darbdavioEmail}.`,
 
-        requestedIds:
-          kandidatIds,
-
-        employerEmail:
-          darbdavioEmail,
-
-        allCandidatesError:
-          visiError?.message || null,
-
-        allCandidates:
-          visiKandidatai || [],
-
-        selectedCandidatesError:
-          pasirinktiError?.message || null,
-
-        selectedCandidates:
-          pasirinktiKandidatai || [],
-      },
+      messageId:
+        info.messageId,
     });
   } catch (error) {
     console.error(
-      "DIAGNOSTIKOS KLAIDA:",
+      "Siuntimo klaida:",
       error
     );
 
@@ -148,7 +296,7 @@ export async function POST(request: NextRequest) {
         error:
           error instanceof Error
             ? error.message
-            : "Nežinoma klaida",
+            : "Nepavyko išsiųsti laiško.",
       },
       { status: 500 }
     );
