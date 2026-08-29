@@ -86,9 +86,12 @@ export default function AdminPage() {
     useState("");
 
   const [jobLoading, setJobLoading] = useState(false);
-  const [changingJobId, setChangingJobId] = useState<number | null>(
-    null
-  );
+
+  const [changingJobId, setChangingJobId] =
+    useState<number | null>(null);
+
+  const [savingJobEmailId, setSavingJobEmailId] =
+    useState<number | null>(null);
 
   useEffect(() => {
     async function checkUser() {
@@ -241,6 +244,10 @@ export default function AdminPage() {
         new Date().toISOString();
     }
 
+    if (statusas === "Naujas") {
+      updateData.issiusta_darbdaviui_at = null;
+    }
+
     const { error } = await supabase
       .from("kandidatai")
       .update(updateData)
@@ -317,6 +324,10 @@ export default function AdminPage() {
 
     if (!confirmed) return;
 
+    const candidatesToDelete = kandidatai.filter((kandidatas) =>
+      ids.includes(kandidatas.id)
+    );
+
     const { error } = await supabase
       .from("kandidatai")
       .delete()
@@ -327,7 +338,25 @@ export default function AdminPage() {
       return;
     }
 
+    const cvPaths = candidatesToDelete
+      .map((kandidatas) => kandidatas.cv_path)
+      .filter((path): path is string => Boolean(path));
+
+    if (cvPaths.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from("cv")
+        .remove(cvPaths);
+
+      if (storageError) {
+        console.warn(
+          "Anketos ištrintos, bet nepavyko pašalinti kai kurių CV failų.",
+          storageError
+        );
+      }
+    }
+
     setPazymetiKandidatai(new Set());
+
     await loadCandidates();
   }
 
@@ -455,7 +484,39 @@ export default function AdminPage() {
     }
 
     await loadJobs();
+
     return true;
+  }
+
+  async function saveEmployerEmail(darbasId: number) {
+    const input = document.getElementById(
+      `darbdavio-email-${darbasId}`
+    ) as HTMLInputElement | null;
+
+    if (!input) {
+      return;
+    }
+
+    const email = input.value.trim();
+
+    if (email && !email.includes("@")) {
+      alert("Įveskite teisingą el. pašto adresą.");
+      return;
+    }
+
+    setSavingJobEmailId(darbasId);
+
+    const saved = await updateJob(
+      darbasId,
+      "darbdavio_email",
+      email || null
+    );
+
+    setSavingJobEmailId(null);
+
+    if (saved) {
+      alert("Darbdavio el. paštas išsaugotas.");
+    }
   }
 
   async function toggleJobActive(darbas: Darbas) {
@@ -550,7 +611,10 @@ export default function AdminPage() {
   const darbdaviai = useMemo(() => {
     const map = new Map<
       string,
-      { email: string; label: string }
+      {
+        email: string;
+        label: string;
+      }
     >();
 
     darbai.forEach((darbas) => {
@@ -650,7 +714,9 @@ export default function AdminPage() {
               disabled={loginLoading}
               className="w-full rounded-lg bg-slate-900 px-5 py-3 font-bold text-white"
             >
-              {loginLoading ? "Jungiama..." : "Prisijungti"}
+              {loginLoading
+                ? "Jungiama..."
+                : "Prisijungti"}
             </button>
           </form>
         </div>
@@ -666,6 +732,7 @@ export default function AdminPage() {
             <h1 className="text-2xl font-bold">
               Norgeworkis administravimas
             </h1>
+
             <p className="mt-1 text-sm text-slate-400">
               {userEmail}
             </p>
@@ -683,22 +750,31 @@ export default function AdminPage() {
 
       <div className="mx-auto max-w-7xl px-6 py-10">
         <div className="grid gap-5 md:grid-cols-3">
-          <div className="rounded-2xl bg-white p-6">
-            Naujos anketos
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="text-slate-600">
+              Naujos anketos
+            </div>
+
             <div className="mt-2 text-4xl font-bold">
               {newCount}
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6">
-            Išsiųstos
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="text-slate-600">
+              Išsiųstos
+            </div>
+
             <div className="mt-2 text-4xl font-bold">
               {sentCount}
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6">
-            Visos anketos
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="text-slate-600">
+              Visos anketos
+            </div>
+
             <div className="mt-2 text-4xl font-bold">
               {kandidatai.length}
             </div>
@@ -710,7 +786,7 @@ export default function AdminPage() {
             Kandidatų anketos
           </h2>
 
-          <div className="mt-6 rounded-2xl bg-white p-5">
+          <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm">
             <div className="flex flex-wrap gap-2">
               {(
                 [
@@ -729,7 +805,7 @@ export default function AdminPage() {
                   className={`rounded-lg px-4 py-2 font-semibold ${
                     filtras === item
                       ? "bg-slate-900 text-white"
-                      : "bg-slate-100"
+                      : "bg-slate-100 text-slate-700"
                   }`}
                 >
                   {item}
@@ -740,7 +816,7 @@ export default function AdminPage() {
             <input
               value={paieska}
               onChange={(e) => setPaieska(e.target.value)}
-              placeholder="Ieškoti..."
+              placeholder="Ieškoti kandidato..."
               className="mt-5 w-full rounded-lg border px-4 py-3"
             />
 
@@ -752,6 +828,7 @@ export default function AdminPage() {
                   onChange={toggleAllVisible}
                   className="h-5 w-5"
                 />
+
                 Pažymėti visus rodomus
               </label>
 
@@ -763,7 +840,9 @@ export default function AdminPage() {
                 <select
                   value={pasirinktasDarbdavioEmail}
                   onChange={(e) =>
-                    setPasirinktasDarbdavioEmail(e.target.value)
+                    setPasirinktasDarbdavioEmail(
+                      e.target.value
+                    )
                   }
                   className="min-w-72 rounded-lg border px-4 py-3"
                 >
@@ -789,7 +868,7 @@ export default function AdminPage() {
                     !pasirinktasDarbdavioEmail
                   }
                   onClick={sendSelectedToEmployer}
-                  className="rounded-lg bg-green-700 px-5 py-3 font-bold text-white disabled:opacity-40"
+                  className="rounded-lg bg-green-700 px-5 py-3 font-bold text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {sending
                     ? "Siunčiama..."
@@ -804,7 +883,7 @@ export default function AdminPage() {
                       Array.from(pazymetiKandidatai)
                     )
                   }
-                  className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 disabled:opacity-40"
+                  className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Ištrinti pažymėtas
                 </button>
@@ -822,7 +901,7 @@ export default function AdminPage() {
             {filteredCandidates.map((kandidatas) => (
               <article
                 key={kandidatas.id}
-                className="rounded-2xl bg-white p-6"
+                className="rounded-2xl bg-white p-6 shadow-sm"
               >
                 <div className="flex flex-wrap items-start justify-between gap-5">
                   <div className="flex gap-4">
@@ -859,15 +938,25 @@ export default function AdminPage() {
                     }
                     className="rounded-lg border px-4 py-3"
                   >
-                    <option value="Naujas">Naujas</option>
+                    <option value="Naujas">
+                      Naujas
+                    </option>
+
                     <option value="Išsiųstas darbdaviui">
                       Išsiųstas darbdaviui
                     </option>
-                    <option value="Pokalbis">Pokalbis</option>
+
+                    <option value="Pokalbis">
+                      Pokalbis
+                    </option>
+
                     <option value="Įdarbintas">
                       Įdarbintas
                     </option>
-                    <option value="Atmestas">Atmestas</option>
+
+                    <option value="Atmestas">
+                      Atmestas
+                    </option>
                   </select>
                 </div>
 
@@ -891,12 +980,34 @@ export default function AdminPage() {
                     <strong>Norvegų kalba:</strong>{" "}
                     {kandidatas.norvegu_kalba || "–"}
                   </div>
+
+                  <div>
+                    <strong>Anglų kalba:</strong>{" "}
+                    {kandidatas.anglu_kalba || "–"}
+                  </div>
+
+                  <div>
+                    <strong>Darbas:</strong>{" "}
+                    {kandidatas.darbai?.pavadinimas || "–"}
+                  </div>
                 </div>
+
+                {kandidatas.apie && (
+                  <div className="mt-5">
+                    <strong>Apie kandidatą:</strong>
+
+                    <p className="mt-2 whitespace-pre-wrap text-slate-700">
+                      {kandidatas.apie}
+                    </p>
+                  </div>
+                )}
 
                 <div className="mt-5 flex flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={() => openCv(kandidatas.cv_path)}
+                    onClick={() =>
+                      openCv(kandidatas.cv_path)
+                    }
                     disabled={!kandidatas.cv_path}
                     className="rounded-lg border px-4 py-2 disabled:opacity-40"
                   >
@@ -908,9 +1019,11 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() =>
-                      deleteCandidates([kandidatas.id])
+                      deleteCandidates([
+                        kandidatas.id,
+                      ])
                     }
-                    className="rounded-lg border border-red-300 px-4 py-2 text-red-700"
+                    className="rounded-lg border border-red-300 px-4 py-2 text-red-700 hover:bg-red-50"
                   >
                     Ištrinti anketą
                   </button>
@@ -931,6 +1044,12 @@ export default function AdminPage() {
                 />
               </article>
             ))}
+
+            {filteredCandidates.length === 0 && (
+              <div className="rounded-2xl bg-white p-8 text-center text-slate-500">
+                Kandidatų pagal pasirinktą filtrą nėra.
+              </div>
+            )}
           </div>
         </section>
 
@@ -941,14 +1060,20 @@ export default function AdminPage() {
 
           <form
             onSubmit={addJob}
-            className="mt-6 rounded-2xl bg-white p-6"
+            className="mt-6 rounded-2xl bg-white p-6 shadow-sm"
           >
-            <div className="grid gap-4 md:grid-cols-2">
+            <h3 className="text-xl font-bold">
+              Naujas darbo pasiūlymas
+            </h3>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
               <input
                 required
                 value={naujasPavadinimas}
                 onChange={(e) =>
-                  setNaujasPavadinimas(e.target.value)
+                  setNaujasPavadinimas(
+                    e.target.value
+                  )
                 }
                 placeholder="Pareigos"
                 className="rounded-lg border px-4 py-3"
@@ -958,7 +1083,9 @@ export default function AdminPage() {
                 required
                 value={naujasMiestas}
                 onChange={(e) =>
-                  setNaujasMiestas(e.target.value)
+                  setNaujasMiestas(
+                    e.target.value
+                  )
                 }
                 placeholder="Miestas"
                 className="rounded-lg border px-4 py-3"
@@ -967,7 +1094,9 @@ export default function AdminPage() {
               <input
                 value={naujasAtlyginimas}
                 onChange={(e) =>
-                  setNaujasAtlyginimas(e.target.value)
+                  setNaujasAtlyginimas(
+                    e.target.value
+                  )
                 }
                 placeholder="Atlyginimas"
                 className="rounded-lg border px-4 py-3"
@@ -977,7 +1106,9 @@ export default function AdminPage() {
                 type="email"
                 value={naujasDarbdavioEmail}
                 onChange={(e) =>
-                  setNaujasDarbdavioEmail(e.target.value)
+                  setNaujasDarbdavioEmail(
+                    e.target.value
+                  )
                 }
                 placeholder="Darbdavio el. paštas"
                 className="rounded-lg border px-4 py-3"
@@ -986,7 +1117,9 @@ export default function AdminPage() {
               <textarea
                 value={naujasAprasymas}
                 onChange={(e) =>
-                  setNaujasAprasymas(e.target.value)
+                  setNaujasAprasymas(
+                    e.target.value
+                  )
                 }
                 placeholder="Aprašymas"
                 className="rounded-lg border px-4 py-3 md:col-span-2"
@@ -996,7 +1129,7 @@ export default function AdminPage() {
             <button
               type="submit"
               disabled={jobLoading}
-              className="mt-5 rounded-lg bg-slate-900 px-5 py-3 font-bold text-white"
+              className="mt-5 rounded-lg bg-slate-900 px-5 py-3 font-bold text-white disabled:opacity-40"
             >
               {jobLoading
                 ? "Kuriama..."
@@ -1008,104 +1141,175 @@ export default function AdminPage() {
             {darbai.map((darbas) => (
               <div
                 key={darbas.id}
-                className="rounded-2xl bg-white p-6"
+                className="rounded-2xl bg-white p-6 shadow-sm"
               >
-                <div className="flex items-center justify-between gap-4">
-                  <strong>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <span
+                    className={`rounded-full px-3 py-1 text-sm font-bold ${
+                      darbas.aktyvus
+                        ? "bg-green-100 text-green-800"
+                        : "bg-slate-200 text-slate-700"
+                    }`}
+                  >
                     {darbas.aktyvus
                       ? "AKTYVUS"
                       : "NEAKTYVUS"}
-                  </strong>
+                  </span>
 
                   <button
                     type="button"
-                    disabled={changingJobId === darbas.id}
+                    disabled={
+                      changingJobId === darbas.id
+                    }
                     onClick={() =>
                       toggleJobActive(darbas)
                     }
-                    className="rounded-lg border px-4 py-2"
+                    className="rounded-lg border px-4 py-2 font-semibold disabled:opacity-40"
                   >
-                    {darbas.aktyvus
+                    {changingJobId === darbas.id
+                      ? "Keičiama..."
+                      : darbas.aktyvus
                       ? "Padaryti neaktyvų"
                       : "Padaryti aktyvų"}
                   </button>
                 </div>
 
                 <div className="mt-5 grid gap-4 md:grid-cols-2">
-                  <input
-                    defaultValue={darbas.pavadinimas}
-                    onBlur={(e) =>
-                      updateJob(
-                        darbas.id,
-                        "pavadinimas",
-                        e.target.value
-                      )
-                    }
-                    className="rounded-lg border px-4 py-3"
-                  />
+                  <div>
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Pareigos
+                    </label>
 
-                  <input
-                    defaultValue={darbas.miestas}
-                    onBlur={(e) =>
-                      updateJob(
-                        darbas.id,
-                        "miestas",
-                        e.target.value
-                      )
-                    }
-                    className="rounded-lg border px-4 py-3"
-                  />
+                    <input
+                      defaultValue={
+                        darbas.pavadinimas
+                      }
+                      onBlur={(e) =>
+                        updateJob(
+                          darbas.id,
+                          "pavadinimas",
+                          e.target.value
+                        )
+                      }
+                      className="w-full rounded-lg border px-4 py-3"
+                    />
+                  </div>
 
-                  <input
-                    defaultValue={
-                      darbas.atlyginimas || ""
-                    }
-                    onBlur={(e) =>
-                      updateJob(
-                        darbas.id,
-                        "atlyginimas",
-                        e.target.value || null
-                      )
-                    }
-                    className="rounded-lg border px-4 py-3"
-                  />
+                  <div>
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Miestas
+                    </label>
 
-                  <input
-                    defaultValue={
-                      darbas.darbdavio_email || ""
-                    }
-                    onBlur={(e) =>
-                      updateJob(
-                        darbas.id,
-                        "darbdavio_email",
-                        e.target.value || null
-                      )
-                    }
-                    className="rounded-lg border px-4 py-3"
-                  />
+                    <input
+                      defaultValue={darbas.miestas}
+                      onBlur={(e) =>
+                        updateJob(
+                          darbas.id,
+                          "miestas",
+                          e.target.value
+                        )
+                      }
+                      className="w-full rounded-lg border px-4 py-3"
+                    />
+                  </div>
 
-                  <textarea
-                    defaultValue={darbas.aprasymas || ""}
-                    onBlur={(e) =>
-                      updateJob(
-                        darbas.id,
-                        "aprasymas",
-                        e.target.value || null
-                      )
-                    }
-                    className="rounded-lg border px-4 py-3 md:col-span-2"
-                  />
+                  <div>
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Atlyginimas
+                    </label>
+
+                    <input
+                      defaultValue={
+                        darbas.atlyginimas || ""
+                      }
+                      onBlur={(e) =>
+                        updateJob(
+                          darbas.id,
+                          "atlyginimas",
+                          e.target.value || null
+                        )
+                      }
+                      className="w-full rounded-lg border px-4 py-3"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Darbdavio el. paštas
+                    </label>
+
+                    <div className="flex gap-2">
+                      <input
+                        id={`darbdavio-email-${darbas.id}`}
+                        type="email"
+                        defaultValue={
+                          darbas.darbdavio_email ||
+                          ""
+                        }
+                        placeholder="darbdavys@imone.no"
+                        className="min-w-0 flex-1 rounded-lg border px-4 py-3"
+                      />
+
+                      <button
+                        type="button"
+                        disabled={
+                          savingJobEmailId ===
+                          darbas.id
+                        }
+                        onClick={() =>
+                          saveEmployerEmail(
+                            darbas.id
+                          )
+                        }
+                        className="rounded-lg bg-green-700 px-4 py-3 font-bold text-white hover:bg-green-800 disabled:opacity-40"
+                      >
+                        {savingJobEmailId ===
+                        darbas.id
+                          ? "Saugoma..."
+                          : "Išsaugoti"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      Aprašymas
+                    </label>
+
+                    <textarea
+                      defaultValue={
+                        darbas.aprasymas || ""
+                      }
+                      onBlur={(e) =>
+                        updateJob(
+                          darbas.id,
+                          "aprasymas",
+                          e.target.value ||
+                            null
+                        )
+                      }
+                      className="w-full rounded-lg border px-4 py-3"
+                    />
+                  </div>
                 </div>
 
                 <button
                   type="button"
-                  onClick={() => deleteJob(darbas.id)}
-                  className="mt-5 rounded-lg border border-red-300 px-4 py-2 text-red-700"
+                  onClick={() =>
+                    deleteJob(darbas.id)
+                  }
+                  className="mt-5 rounded-lg border border-red-300 px-4 py-2 font-semibold text-red-700 hover:bg-red-50"
                 >
                   Ištrinti darbo pasiūlymą
                 </button>
               </div>
             ))}
+
+            {darbai.length === 0 && (
+              <div className="rounded-2xl bg-white p-8 text-center text-slate-500">
+                Darbo pasiūlymų nėra.
+              </div>
+            )}
           </div>
         </section>
       </div>
