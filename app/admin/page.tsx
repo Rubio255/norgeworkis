@@ -55,6 +55,8 @@ type Darbas = {
   kalba_reikalavimas: string | null;
   vairuotojo_pazymejimas: string | null;
   darbo_pradzia: string | null;
+
+  video_url: string | null;
 };
 
 type Filtras =
@@ -66,6 +68,8 @@ type Filtras =
   | "Visi";
 
 const ADMIN_EMAIL = "info@optinvest.lt";
+
+const MAX_VIDEO_SIZE = 10 * 1024 * 1024;
 
 export default function AdminPage() {
   const [supabase] = useState(() => createClient());
@@ -116,36 +120,50 @@ export default function AdminPage() {
   const [sending, setSending] =
     useState(false);
 
-  const [naujasPavadinimas, setNaujasPavadinimas] =
-    useState("");
+  const [
+    naujasPavadinimas,
+    setNaujasPavadinimas,
+  ] = useState("");
 
-  const [naujasMiestas, setNaujasMiestas] =
-    useState("");
+  const [
+    naujasMiestas,
+    setNaujasMiestas,
+  ] = useState("");
 
-  const [naujasAtlyginimas, setNaujasAtlyginimas] =
-    useState("");
+  const [
+    naujasAtlyginimas,
+    setNaujasAtlyginimas,
+  ] = useState("");
 
-  const [naujasAprasymas, setNaujasAprasymas] =
-    useState("");
+  const [
+    naujasAprasymas,
+    setNaujasAprasymas,
+  ] = useState("");
 
   const [
     naujasDarbdavioEmail,
     setNaujasDarbdavioEmail,
   ] = useState("");
 
-  const [naujasGrafikas, setNaujasGrafikas] =
-    useState("");
+  const [
+    naujasGrafikas,
+    setNaujasGrafikas,
+  ] = useState("");
 
-  const [naujaRotacija, setNaujaRotacija] =
-    useState("");
+  const [
+    naujaRotacija,
+    setNaujaRotacija,
+  ] = useState("");
 
   const [
     naujasApgyvendinimas,
     setNaujasApgyvendinimas,
   ] = useState("");
 
-  const [naujaKelione, setNaujaKelione] =
-    useState("");
+  const [
+    naujaKelione,
+    setNaujaKelione,
+  ] = useState("");
 
   const [
     naujaPatirtisReikalavimas,
@@ -178,6 +196,16 @@ export default function AdminPage() {
   const [
     savingJobEmailId,
     setSavingJobEmailId,
+  ] = useState<number | null>(null);
+
+  const [
+    uploadingVideoJobId,
+    setUploadingVideoJobId,
+  ] = useState<number | null>(null);
+
+  const [
+    removingVideoJobId,
+    setRemovingVideoJobId,
   ] = useState<number | null>(null);
 
   useEffect(() => {
@@ -241,7 +269,9 @@ export default function AdminPage() {
       return;
     }
 
-    if (data.user?.email !== ADMIN_EMAIL) {
+    if (
+      data.user?.email !== ADMIN_EMAIL
+    ) {
       await supabase.auth.signOut();
 
       setLoginError(
@@ -263,7 +293,9 @@ export default function AdminPage() {
     setUserEmail(null);
     setKandidatai([]);
     setDarbai([]);
-    setPazymetiKandidatai(new Set());
+    setPazymetiKandidatai(
+      new Set()
+    );
   }
 
   async function loadCandidates() {
@@ -311,7 +343,9 @@ export default function AdminPage() {
       (data || []) as unknown as Kandidatas[]
     );
 
-    setPazymetiKandidatai(new Set());
+    setPazymetiKandidatai(
+      new Set()
+    );
   }
 
   async function loadJobs() {
@@ -330,7 +364,9 @@ export default function AdminPage() {
       return;
     }
 
-    setDarbai((data || []) as Darbas[]);
+    setDarbai(
+      (data || []) as Darbas[]
+    );
   }
 
   async function updateCandidateStatus(
@@ -339,7 +375,9 @@ export default function AdminPage() {
   ) {
     const updateData: {
       statusas: string;
-      issiusta_darbdaviui_at?: string | null;
+      issiusta_darbdaviui_at?:
+        | string
+        | null;
     } = {
       statusas,
     };
@@ -381,7 +419,8 @@ export default function AdminPage() {
       await supabase
         .from("kandidatai")
         .update({
-          admin_pastabos: adminPastabos,
+          admin_pastabos:
+            adminPastabos,
         })
         .eq("id", id);
 
@@ -403,7 +442,10 @@ export default function AdminPage() {
     const { data, error } =
       await supabase.storage
         .from("cv")
-        .createSignedUrl(cvPath, 300);
+        .createSignedUrl(
+          cvPath,
+          300
+        );
 
     if (
       error ||
@@ -427,23 +469,28 @@ export default function AdminPage() {
   function toggleCandidate(
     id: number
   ) {
-    setPazymetiKandidatai((current) => {
-      const next = new Set(current);
+    setPazymetiKandidatai(
+      (current) => {
+        const next =
+          new Set(current);
 
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
+        if (next.has(id)) {
+          next.delete(id);
+        } else {
+          next.add(id);
+        }
+
+        return next;
       }
-
-      return next;
-    });
+    );
   }
 
   async function deleteCandidates(
     ids: number[]
   ) {
-    if (ids.length === 0) return;
+    if (ids.length === 0) {
+      return;
+    }
 
     const confirmed =
       window.confirm(
@@ -452,11 +499,16 @@ export default function AdminPage() {
           : `Ar tikrai norite ištrinti ${ids.length} pažymėtas kandidatų anketas?`
       );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     const candidatesToDelete =
-      kandidatai.filter((kandidatas) =>
-        ids.includes(kandidatas.id)
+      kandidatai.filter(
+        (kandidatas) =>
+          ids.includes(
+            kandidatas.id
+          )
       );
 
     const { error } =
@@ -479,11 +531,15 @@ export default function AdminPage() {
             kandidatas.cv_path
         )
         .filter(
-          (path): path is string =>
+          (
+            path
+          ): path is string =>
             Boolean(path)
         );
 
-    if (cvPaths.length > 0) {
+    if (
+      cvPaths.length > 0
+    ) {
       const {
         error: storageError,
       } =
@@ -499,7 +555,9 @@ export default function AdminPage() {
       }
     }
 
-    setPazymetiKandidatai(new Set());
+    setPazymetiKandidatai(
+      new Set()
+    );
 
     await loadCandidates();
   }
@@ -517,46 +575,76 @@ export default function AdminPage() {
     }
 
     const selectedCandidates =
-      kandidatai.filter((kandidatas) =>
-        ids.includes(kandidatas.id)
+      kandidatai.filter(
+        (kandidatas) =>
+          ids.includes(
+            kandidatas.id
+          )
       );
 
     const excelData =
       selectedCandidates.map(
         (kandidatas, index) => ({
           "Nr.": index + 1,
+
           Vardas:
-            kandidatas.vardas || "",
+            kandidatas.vardas ||
+            "",
+
           Pavardė:
-            kandidatas.pavarde || "",
+            kandidatas.pavarde ||
+            "",
+
           Telefonas:
-            kandidatas.telefonas || "",
+            kandidatas.telefonas ||
+            "",
+
           "El. paštas":
-            kandidatas.email || "",
+            kandidatas.email ||
+            "",
+
           Profesija:
-            kandidatas.profesija || "",
+            kandidatas.profesija ||
+            "",
+
           Patirtis:
-            kandidatas.patirtis || "",
+            kandidatas.patirtis ||
+            "",
+
           "Norvegų kalba":
-            kandidatas.norvegu_kalba || "",
+            kandidatas.norvegu_kalba ||
+            "",
+
           "Anglų kalba":
-            kandidatas.anglu_kalba || "",
+            kandidatas.anglu_kalba ||
+            "",
+
           Darbas:
-            kandidatas.darbai?.pavadinimas ||
+            kandidatas.darbai
+              ?.pavadinimas ||
             "",
+
           Miestas:
-            kandidatas.darbai?.miestas ||
+            kandidatas.darbai
+              ?.miestas ||
             "",
+
           Atlyginimas:
-            kandidatas.darbai?.atlyginimas ||
+            kandidatas.darbai
+              ?.atlyginimas ||
             "",
+
           "Apie kandidatą":
-            kandidatas.apie || "",
+            kandidatas.apie ||
+            "",
+
           Statusas:
             kandidatas.statusas ||
             "Naujas",
+
           "Admin pastabos":
-            kandidatas.admin_pastabos || "",
+            kandidatas.admin_pastabos ||
+            "",
         })
       );
 
@@ -624,8 +712,12 @@ export default function AdminPage() {
       return;
     }
 
-    if (!pasirinktasDarbdavioEmail) {
-      alert("Pasirinkite darbdavį.");
+    if (
+      !pasirinktasDarbdavioEmail
+    ) {
+      alert(
+        "Pasirinkite darbdavį."
+      );
       return;
     }
 
@@ -634,7 +726,9 @@ export default function AdminPage() {
         `Ar tikrai siųsti ${ids.length} pažymėtų kandidatų Excel failą adresu ${pasirinktasDarbdavioEmail}?`
       );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     setSending(true);
 
@@ -652,6 +746,7 @@ export default function AdminPage() {
 
             body: JSON.stringify({
               kandidatIds: ids,
+
               darbdavioEmail:
                 pasirinktasDarbdavioEmail,
             }),
@@ -673,7 +768,9 @@ export default function AdminPage() {
           "Kandidatų sąrašas sėkmingai išsiųstas darbdaviui."
       );
 
-      setPazymetiKandidatai(new Set());
+      setPazymetiKandidatai(
+        new Set()
+      );
 
       await loadCandidates();
     } catch (error) {
@@ -748,6 +845,8 @@ export default function AdminPage() {
             naujaDarboPradzia.trim() ||
             null,
 
+          video_url: null,
+
           aktyvus: true,
         });
 
@@ -798,6 +897,7 @@ export default function AdminPage() {
       | "kalba_reikalavimas"
       | "vairuotojo_pazymejimas"
       | "darbo_pradzia"
+      | "video_url"
     >,
 
     value:
@@ -836,7 +936,9 @@ export default function AdminPage() {
         `darbdavio-email-${darbasId}`
       ) as HTMLInputElement | null;
 
-    if (!input) return;
+    if (!input) {
+      return;
+    }
 
     const email =
       input.value.trim();
@@ -851,7 +953,9 @@ export default function AdminPage() {
       return;
     }
 
-    setSavingJobEmailId(darbasId);
+    setSavingJobEmailId(
+      darbasId
+    );
 
     const saved =
       await updateJob(
@@ -860,7 +964,9 @@ export default function AdminPage() {
         email || null
       );
 
-    setSavingJobEmailId(null);
+    setSavingJobEmailId(
+      null
+    );
 
     if (saved) {
       alert(
@@ -869,10 +975,259 @@ export default function AdminPage() {
     }
   }
 
+  function getVideoStoragePath(
+    videoUrl: string | null
+  ) {
+    if (!videoUrl) {
+      return null;
+    }
+
+    const marker =
+      "/storage/v1/object/public/job-videos/";
+
+    const markerIndex =
+      videoUrl.indexOf(marker);
+
+    if (markerIndex === -1) {
+      return null;
+    }
+
+    const path =
+      videoUrl.slice(
+        markerIndex +
+          marker.length
+      );
+
+    return decodeURIComponent(
+      path
+    );
+  }
+
+  async function uploadJobVideo(
+    darbas: Darbas,
+    file: File
+  ) {
+    if (
+      file.type !== "video/mp4"
+    ) {
+      alert(
+        "Galima įkelti tik MP4 formato video."
+      );
+      return;
+    }
+
+    if (
+      file.size >
+      MAX_VIDEO_SIZE
+    ) {
+      alert(
+        "Video failas per didelis. Maksimalus dydis – 10 MB."
+      );
+      return;
+    }
+
+    setUploadingVideoJobId(
+      darbas.id
+    );
+
+    try {
+      const safeName =
+        file.name
+          .toLowerCase()
+          .replace(
+            /[^a-z0-9._-]/g,
+            "-"
+          );
+
+      const filePath =
+        `${darbas.id}/${Date.now()}-${safeName}`;
+
+      const {
+        error: uploadError,
+      } =
+        await supabase.storage
+          .from("job-videos")
+          .upload(
+            filePath,
+            file,
+            {
+              contentType:
+                "video/mp4",
+
+              cacheControl:
+                "3600",
+
+              upsert: false,
+            }
+          );
+
+      if (uploadError) {
+        throw new Error(
+          `Nepavyko įkelti video: ${uploadError.message}`
+        );
+      }
+
+      const { data } =
+        supabase.storage
+          .from("job-videos")
+          .getPublicUrl(
+            filePath
+          );
+
+      const publicUrl =
+        data.publicUrl;
+
+      const { error: dbError } =
+        await supabase
+          .from("darbai")
+          .update({
+            video_url:
+              publicUrl,
+          })
+          .eq(
+            "id",
+            darbas.id
+          );
+
+      if (dbError) {
+        await supabase.storage
+          .from("job-videos")
+          .remove([
+            filePath,
+          ]);
+
+        throw new Error(
+          `Video įkeltas, tačiau nepavyko jo priskirti darbo pasiūlymui: ${dbError.message}`
+        );
+      }
+
+      const oldVideoPath =
+        getVideoStoragePath(
+          darbas.video_url
+        );
+
+      if (oldVideoPath) {
+        const {
+          error:
+            oldDeleteError,
+        } =
+          await supabase.storage
+            .from("job-videos")
+            .remove([
+              oldVideoPath,
+            ]);
+
+        if (
+          oldDeleteError
+        ) {
+          console.warn(
+            "Naujas video įkeltas, tačiau seno failo pašalinti nepavyko.",
+            oldDeleteError
+          );
+        }
+      }
+
+      await loadJobs();
+
+      alert(
+        "Video sėkmingai įkeltas."
+      );
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Nepavyko įkelti video."
+      );
+    } finally {
+      setUploadingVideoJobId(
+        null
+      );
+    }
+  }
+
+  async function removeJobVideo(
+    darbas: Darbas
+  ) {
+    if (!darbas.video_url) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        "Ar tikrai norite pašalinti šio darbo video?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setRemovingVideoJobId(
+      darbas.id
+    );
+
+    try {
+      const path =
+        getVideoStoragePath(
+          darbas.video_url
+        );
+
+      const { error: dbError } =
+        await supabase
+          .from("darbai")
+          .update({
+            video_url: null,
+          })
+          .eq(
+            "id",
+            darbas.id
+          );
+
+      if (dbError) {
+        throw new Error(
+          `Nepavyko pašalinti video iš darbo pasiūlymo: ${dbError.message}`
+        );
+      }
+
+      if (path) {
+        const {
+          error: removeError,
+        } =
+          await supabase.storage
+            .from("job-videos")
+            .remove([path]);
+
+        if (removeError) {
+          console.warn(
+            "Video URL pašalintas, tačiau failo iš Storage pašalinti nepavyko.",
+            removeError
+          );
+        }
+      }
+
+      await loadJobs();
+
+      alert(
+        "Video pašalintas."
+      );
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Nepavyko pašalinti video."
+      );
+    } finally {
+      setRemovingVideoJobId(
+        null
+      );
+    }
+  }
+
   async function toggleJobActive(
     darbas: Darbas
   ) {
-    setChangingJobId(darbas.id);
+    setChangingJobId(
+      darbas.id
+    );
 
     await updateJob(
       darbas.id,
@@ -891,7 +1246,15 @@ export default function AdminPage() {
         "Ar tikrai norite ištrinti šį darbo pasiūlymą?"
       );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
+
+    const darbas =
+      darbai.find(
+        (item) =>
+          item.id === id
+      );
 
     const { error } =
       await supabase
@@ -906,6 +1269,36 @@ export default function AdminPage() {
       return;
     }
 
+    if (
+      darbas?.video_url
+    ) {
+      const videoPath =
+        getVideoStoragePath(
+          darbas.video_url
+        );
+
+      if (videoPath) {
+        const {
+          error:
+            videoDeleteError,
+        } =
+          await supabase.storage
+            .from("job-videos")
+            .remove([
+              videoPath,
+            ]);
+
+        if (
+          videoDeleteError
+        ) {
+          console.warn(
+            "Darbas ištrintas, tačiau video failo pašalinti nepavyko.",
+            videoDeleteError
+          );
+        }
+      }
+    }
+
     await loadJobs();
   }
 
@@ -914,7 +1307,9 @@ export default function AdminPage() {
       let result =
         kandidatai;
 
-      if (filtras === "Nauji") {
+      if (
+        filtras === "Nauji"
+      ) {
         result =
           result.filter(
             (k) =>
@@ -924,7 +1319,10 @@ export default function AdminPage() {
           );
       }
 
-      if (filtras === "Išsiųsti") {
+      if (
+        filtras ===
+        "Išsiųsti"
+      ) {
         result =
           result.filter(
             (k) =>
@@ -933,7 +1331,10 @@ export default function AdminPage() {
           );
       }
 
-      if (filtras === "Pokalbis") {
+      if (
+        filtras ===
+        "Pokalbis"
+      ) {
         result =
           result.filter(
             (k) =>
@@ -942,7 +1343,10 @@ export default function AdminPage() {
           );
       }
 
-      if (filtras === "Įdarbinti") {
+      if (
+        filtras ===
+        "Įdarbinti"
+      ) {
         result =
           result.filter(
             (k) =>
@@ -951,7 +1355,10 @@ export default function AdminPage() {
           );
       }
 
-      if (filtras === "Atmesti") {
+      if (
+        filtras ===
+        "Atmesti"
+      ) {
         result =
           result.filter(
             (k) =>
@@ -975,11 +1382,14 @@ export default function AdminPage() {
                 k.email,
                 k.telefonas,
                 k.profesija,
-                k.darbai?.pavadinimas ||
+                k.darbai
+                  ?.pavadinimas ||
                   "",
-                k.darbai?.miestas ||
+                k.darbai
+                  ?.miestas ||
                   "",
-                k.darbai?.darbdavio_email ||
+                k.darbai
+                  ?.darbdavio_email ||
                   "",
               ]
                 .join(" ")
@@ -1015,14 +1425,22 @@ export default function AdminPage() {
           const email =
             darbas.darbdavio_email?.trim();
 
-          if (!email) return;
+          if (!email) {
+            return;
+          }
 
-          if (!map.has(email)) {
-            map.set(email, {
+          if (
+            !map.has(email)
+          ) {
+            map.set(
               email,
-              label:
-                `${darbas.pavadinimas} – ${email}`,
-            });
+              {
+                email,
+
+                label:
+                  `${darbas.pavadinimas} – ${email}`,
+              }
+            );
           }
         }
       );
@@ -1033,7 +1451,8 @@ export default function AdminPage() {
     }, [darbai]);
 
   const allVisibleSelected =
-    filteredCandidates.length > 0 &&
+    filteredCandidates.length >
+      0 &&
     filteredCandidates.every(
       (kandidatas) =>
         pazymetiKandidatai.has(
@@ -1074,7 +1493,8 @@ export default function AdminPage() {
     kandidatai.filter(
       (k) =>
         !k.statusas ||
-        k.statusas === "Naujas"
+        k.statusas ===
+          "Naujas"
     ).length;
 
   const sentCount =
@@ -1105,13 +1525,17 @@ export default function AdminPage() {
           </h1>
 
           <form
-            onSubmit={handleLogin}
+            onSubmit={
+              handleLogin
+            }
             className="mt-8 space-y-5"
           >
             <input
               type="email"
               required
-              value={loginEmail}
+              value={
+                loginEmail
+              }
               onChange={(e) =>
                 setLoginEmail(
                   e.target.value
@@ -1123,7 +1547,9 @@ export default function AdminPage() {
             <input
               type="password"
               required
-              value={loginPassword}
+              value={
+                loginPassword
+              }
               onChange={(e) =>
                 setLoginPassword(
                   e.target.value
@@ -1134,14 +1560,18 @@ export default function AdminPage() {
 
             {loginError && (
               <div className="rounded-lg bg-red-50 p-4 text-red-700">
-                {loginError}
+                {
+                  loginError
+                }
               </div>
             )}
 
             <button
               type="submit"
-              disabled={loginLoading}
-              className="w-full rounded-lg bg-slate-900 px-5 py-3 font-bold text-white"
+              disabled={
+                loginLoading
+              }
+              className="w-full rounded-lg bg-slate-900 px-5 py-3 font-bold text-white disabled:opacity-40"
             >
               {loginLoading
                 ? "Jungiama..."
@@ -1169,7 +1599,9 @@ export default function AdminPage() {
 
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={
+              handleLogout
+            }
             className="rounded-lg border border-slate-700 px-4 py-2 font-semibold"
           >
             Atsijungti
@@ -1205,7 +1637,9 @@ export default function AdminPage() {
             </div>
 
             <div className="mt-2 text-4xl font-bold">
-              {kandidatai.length}
+              {
+                kandidatai.length
+              }
             </div>
           </div>
         </div>
@@ -1231,7 +1665,9 @@ export default function AdminPage() {
                   type="button"
                   key={item}
                   onClick={() =>
-                    setFiltras(item)
+                    setFiltras(
+                      item
+                    )
                   }
                   className={`rounded-lg px-4 py-2 font-semibold ${
                     filtras === item
@@ -1273,7 +1709,9 @@ export default function AdminPage() {
 
               <p className="mt-3 font-semibold">
                 Pažymėta:{" "}
-                {pazymetiKandidatai.size}
+                {
+                  pazymetiKandidatai.size
+                }
               </p>
 
               <div className="mt-4 flex flex-wrap gap-3">
@@ -1293,7 +1731,9 @@ export default function AdminPage() {
                   </option>
 
                   {darbdaviai.map(
-                    (darbdavys) => (
+                    (
+                      darbdavys
+                    ) => (
                       <option
                         key={
                           darbdavys.email
@@ -1302,7 +1742,9 @@ export default function AdminPage() {
                           darbdavys.email
                         }
                       >
-                        {darbdavys.label}
+                        {
+                          darbdavys.label
+                        }
                       </option>
                     )
                   )}
@@ -1363,15 +1805,21 @@ export default function AdminPage() {
 
           {errorMessage && (
             <div className="mt-5 rounded-lg bg-red-50 p-4 text-red-700">
-              {errorMessage}
+              {
+                errorMessage
+              }
             </div>
           )}
 
           <div className="mt-6 space-y-5">
             {filteredCandidates.map(
-              (kandidatas) => (
+              (
+                kandidatas
+              ) => (
                 <article
-                  key={kandidatas.id}
+                  key={
+                    kandidatas.id
+                  }
                   className="rounded-2xl bg-white p-6 shadow-sm"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-5">
@@ -1391,8 +1839,12 @@ export default function AdminPage() {
 
                       <div>
                         <h3 className="text-xl font-bold">
-                          {kandidatas.vardas}{" "}
-                          {kandidatas.pavarde}
+                          {
+                            kandidatas.vardas
+                          }{" "}
+                          {
+                            kandidatas.pavarde
+                          }
                         </h3>
 
                         <p className="mt-1 text-slate-600">
@@ -1443,21 +1895,27 @@ export default function AdminPage() {
                       <strong>
                         Telefonas:
                       </strong>{" "}
-                      {kandidatas.telefonas}
+                      {
+                        kandidatas.telefonas
+                      }
                     </div>
 
                     <div>
                       <strong>
                         El. paštas:
                       </strong>{" "}
-                      {kandidatas.email}
+                      {
+                        kandidatas.email
+                      }
                     </div>
 
                     <div>
                       <strong>
                         Patirtis:
                       </strong>{" "}
-                      {kandidatas.patirtis}
+                      {
+                        kandidatas.patirtis
+                      }
                     </div>
 
                     <div>
@@ -1493,7 +1951,9 @@ export default function AdminPage() {
                       </strong>
 
                       <p className="mt-2 whitespace-pre-wrap text-slate-700">
-                        {kandidatas.apie}
+                        {
+                          kandidatas.apie
+                        }
                       </p>
                     </div>
                   )}
@@ -1519,9 +1979,11 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={() =>
-                        deleteCandidates([
-                          kandidatas.id,
-                        ])
+                        deleteCandidates(
+                          [
+                            kandidatas.id,
+                          ]
+                        )
                       }
                       className="rounded-lg border border-red-300 px-4 py-2 text-red-700 hover:bg-red-50"
                     >
@@ -1550,8 +2012,7 @@ export default function AdminPage() {
             {filteredCandidates.length ===
               0 && (
               <div className="rounded-2xl bg-white p-8 text-center text-slate-500">
-                Kandidatų pagal pasirinktą
-                filtrą nėra.
+                Kandidatų pagal pasirinktą filtrą nėra.
               </div>
             )}
           </div>
@@ -1613,24 +2074,28 @@ export default function AdminPage() {
               />
 
               <input
-                value={naujasGrafikas}
+                value={
+                  naujasGrafikas
+                }
                 onChange={(e) =>
                   setNaujasGrafikas(
                     e.target.value
                   )
                 }
-                placeholder="Grafikas, pvz. 10 val./d., 6 d./sav."
+                placeholder="Grafikas"
                 className="rounded-lg border px-4 py-3"
               />
 
               <input
-                value={naujaRotacija}
+                value={
+                  naujaRotacija
+                }
                 onChange={(e) =>
                   setNaujaRotacija(
                     e.target.value
                   )
                 }
-                placeholder="Rotacija, pvz. 6/2"
+                placeholder="Rotacija"
                 className="rounded-lg border px-4 py-3"
               />
 
@@ -1643,18 +2108,20 @@ export default function AdminPage() {
                     e.target.value
                   )
                 }
-                placeholder="Apgyvendinimas, pvz. nemokamas"
+                placeholder="Apgyvendinimas"
                 className="rounded-lg border px-4 py-3"
               />
 
               <input
-                value={naujaKelione}
+                value={
+                  naujaKelione
+                }
                 onChange={(e) =>
                   setNaujaKelione(
                     e.target.value
                   )
                 }
-                placeholder="Kelionė, pvz. apmokama / kompensuojama"
+                placeholder="Kelionė"
                 className="rounded-lg border px-4 py-3"
               />
 
@@ -1740,7 +2207,9 @@ export default function AdminPage() {
 
             <button
               type="submit"
-              disabled={jobLoading}
+              disabled={
+                jobLoading
+              }
               className="mt-5 rounded-lg bg-slate-900 px-5 py-3 font-bold text-white disabled:opacity-40"
             >
               {jobLoading
@@ -1753,7 +2222,9 @@ export default function AdminPage() {
             {darbai.map(
               (darbas) => (
                 <div
-                  key={darbas.id}
+                  key={
+                    darbas.id
+                  }
                   className="rounded-2xl bg-white p-6 shadow-sm"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-4">
@@ -1829,7 +2300,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "atlyginimas",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1843,7 +2315,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "grafikas",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1857,7 +2330,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "rotacija",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1871,7 +2345,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "apgyvendinimas",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1885,7 +2360,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "kelione",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1899,7 +2375,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "patirtis_reikalavimas",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1913,7 +2390,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "kalba_reikalavimas",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1927,7 +2405,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "vairuotojo_pazymejimas",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1941,7 +2420,8 @@ export default function AdminPage() {
                         updateJob(
                           darbas.id,
                           "darbo_pradzia",
-                          value || null
+                          value ||
+                            null
                         )
                       }
                     />
@@ -1974,7 +2454,7 @@ export default function AdminPage() {
                               darbas.id
                             )
                           }
-                          className="rounded-lg bg-green-700 px-4 py-3 font-bold text-white disabled:opacity-40"
+                          className="rounded-lg bg-green-700 px-4 py-3 font-bold text-white hover:bg-green-800 disabled:opacity-40"
                         >
                           {savingJobEmailId ===
                           darbas.id
@@ -1998,7 +2478,8 @@ export default function AdminPage() {
                           updateJob(
                             darbas.id,
                             "aprasymas",
-                            e.target.value ||
+                            e.target
+                              .value ||
                               null
                           )
                         }
@@ -2007,12 +2488,103 @@ export default function AdminPage() {
                     </div>
                   </div>
 
+                  <div className="mt-7 border-t border-slate-200 pt-6">
+                    <h4 className="text-lg font-bold text-slate-900">
+                      Darbo video
+                    </h4>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                      MP4 formatas, iki 10 MB.
+                    </p>
+
+                    {darbas.video_url && (
+                      <div className="mt-5">
+                        <video
+                          key={
+                            darbas.video_url
+                          }
+                          src={
+                            darbas.video_url
+                          }
+                          controls
+                          muted
+                          playsInline
+                          className="aspect-video w-full max-w-2xl rounded-xl bg-black object-cover"
+                        />
+                      </div>
+                    )}
+
+                    <div className="mt-5 flex flex-wrap items-center gap-3">
+                      <label className="cursor-pointer rounded-lg bg-blue-700 px-5 py-3 font-bold text-white hover:bg-blue-800">
+                        {uploadingVideoJobId ===
+                        darbas.id
+                          ? "Įkeliama..."
+                          : darbas.video_url
+                          ? "Pakeisti video"
+                          : "Įkelti video"}
+
+                        <input
+                          type="file"
+                          accept="video/mp4,.mp4"
+                          disabled={
+                            uploadingVideoJobId ===
+                            darbas.id
+                          }
+                          onChange={async (
+                            e
+                          ) => {
+                            const file =
+                              e
+                                .target
+                                .files?.[0];
+
+                            if (
+                              file
+                            ) {
+                              await uploadJobVideo(
+                                darbas,
+                                file
+                              );
+                            }
+
+                            e.target.value =
+                              "";
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {darbas.video_url && (
+                        <button
+                          type="button"
+                          disabled={
+                            removingVideoJobId ===
+                            darbas.id
+                          }
+                          onClick={() =>
+                            removeJobVideo(
+                              darbas
+                            )
+                          }
+                          className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40"
+                        >
+                          {removingVideoJobId ===
+                          darbas.id
+                            ? "Šalinama..."
+                            : "Pašalinti video"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
                   <button
                     type="button"
                     onClick={() =>
-                      deleteJob(darbas.id)
+                      deleteJob(
+                        darbas.id
+                      )
                     }
-                    className="mt-5 rounded-lg border border-red-300 px-4 py-2 font-semibold text-red-700 hover:bg-red-50"
+                    className="mt-7 rounded-lg border border-red-300 px-4 py-2 font-semibold text-red-700 hover:bg-red-50"
                   >
                     Ištrinti darbo pasiūlymą
                   </button>
@@ -2020,7 +2592,8 @@ export default function AdminPage() {
               )
             )}
 
-            {darbai.length === 0 && (
+            {darbai.length ===
+              0 && (
               <div className="rounded-2xl bg-white p-8 text-center text-slate-500">
                 Darbo pasiūlymų nėra.
               </div>
@@ -2039,7 +2612,9 @@ function JobField({
 }: {
   label: string;
   value: string | null;
-  onSave: (value: string) => void;
+  onSave: (
+    value: string
+  ) => void;
 }) {
   return (
     <div>
@@ -2048,9 +2623,13 @@ function JobField({
       </label>
 
       <input
-        defaultValue={value || ""}
+        defaultValue={
+          value || ""
+        }
         onBlur={(e) =>
-          onSave(e.target.value)
+          onSave(
+            e.target.value
+          )
         }
         className="w-full rounded-lg border px-4 py-3"
       />
