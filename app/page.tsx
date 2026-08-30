@@ -10,7 +10,7 @@ import {
   CalendarDays,
   Car,
   Clock3,
-  Home,
+  House,
   Languages,
   MapPin,
   Plane,
@@ -71,7 +71,9 @@ function InfoRow({
   label: string;
   value: string | null;
 }) {
-  if (!value) return null;
+  if (!value) {
+    return null;
+  }
 
   return (
     <div className="flex items-start gap-3">
@@ -105,7 +107,9 @@ export default function Home() {
         .from("darbai")
         .select("*")
         .eq("aktyvus", true)
-        .order("created_at", { ascending: false });
+        .order("created_at", {
+          ascending: false,
+        });
 
       if (error) {
         setErrorMessage(
@@ -113,6 +117,7 @@ export default function Home() {
         );
 
         setLoading(false);
+
         return;
       }
 
@@ -351,7 +356,7 @@ export default function Home() {
 
                   <InfoRow
                     icon={
-                      <Home
+                      <House
                         className="h-5 w-5"
                         strokeWidth={1.8}
                       />
