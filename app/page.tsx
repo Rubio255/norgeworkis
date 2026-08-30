@@ -37,6 +37,8 @@ type Darbas = {
   kalba_reikalavimas: string | null;
   vairuotojo_pazymejimas: string | null;
   darbo_pradzia: string | null;
+
+  video_url: string | null;
 };
 
 function NorgeworkisLogo() {
@@ -117,7 +119,6 @@ export default function Home() {
         );
 
         setLoading(false);
-
         return;
       }
 
@@ -330,6 +331,21 @@ export default function Home() {
                     {darbas.miestas}, Norvegija
                   </span>
                 </div>
+
+                {darbas.video_url && (
+                  <div className="mt-6 overflow-hidden rounded-2xl bg-black shadow-sm">
+                    <video
+                      src={darbas.video_url}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      controls
+                      preload="metadata"
+                      className="aspect-video w-full object-cover"
+                    />
+                  </div>
+                )}
 
                 <div className="mt-7 grid gap-x-10 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
                   <InfoRow
