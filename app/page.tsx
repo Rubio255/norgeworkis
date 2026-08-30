@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
 import {
   Banknote,
   BriefcaseBusiness,
   Building2,
+  CalendarDays,
+  Car,
+  Clock3,
+  Home,
+  Languages,
   MapPin,
+  Plane,
   ShieldCheck,
+  UserRoundCheck,
 } from "lucide-react";
 
 import { createClient } from "../utils/supabase/client";
@@ -20,6 +28,15 @@ type Darbas = {
   atlyginimas: string | null;
   aprasymas: string | null;
   aktyvus: boolean;
+
+  grafikas: string | null;
+  rotacija: string | null;
+  apgyvendinimas: string | null;
+  kelione: string | null;
+  patirtis_reikalavimas: string | null;
+  kalba_reikalavimas: string | null;
+  vairuotojo_pazymejimas: string | null;
+  darbo_pradzia: string | null;
 };
 
 function NorgeworkisLogo() {
@@ -45,6 +62,36 @@ function NorgeworkisLogo() {
   );
 }
 
+function InfoRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | null;
+}) {
+  if (!value) return null;
+
+  return (
+    <div className="flex items-start gap-3">
+      <div className="mt-0.5 shrink-0 text-slate-500">
+        {icon}
+      </div>
+
+      <div className="min-w-0">
+        <div className="text-sm font-semibold text-slate-500">
+          {label}
+        </div>
+
+        <div className="mt-0.5 text-slate-800">
+          {value}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [supabase] = useState(() => createClient());
 
@@ -64,11 +111,12 @@ export default function Home() {
         setErrorMessage(
           `Nepavyko gauti darbo pasiūlymų: ${error.message}`
         );
+
         setLoading(false);
         return;
       }
 
-      setDarbai(data || []);
+      setDarbai((data || []) as Darbas[]);
       setLoading(false);
     }
 
@@ -110,6 +158,7 @@ export default function Home() {
                   className="h-5 w-5"
                   strokeWidth={1.8}
                 />
+
                 Darbas Norvegijoje
               </div>
 
@@ -199,8 +248,8 @@ export default function Home() {
             </h2>
 
             <p className="mt-4 text-lg leading-8 text-slate-600">
-              Peržiūrėkite aktyvias pozicijas ir pateikite kandidatūrą
-              tiesiai į pasirinktą darbo pasiūlymą.
+              Peržiūrėkite aktyvias pozicijas, darbo sąlygas ir pateikite
+              kandidatūrą tiesiai į pasirinktą darbo pasiūlymą.
             </p>
           </div>
 
@@ -216,73 +265,177 @@ export default function Home() {
             </div>
           )}
 
-          {!loading && !errorMessage && darbai.length === 0 && (
-            <div className="mt-10 rounded-xl border border-slate-200 bg-white p-6 text-slate-600">
-              Šiuo metu aktyvių darbo pasiūlymų nėra.
-            </div>
-          )}
+          {!loading &&
+            !errorMessage &&
+            darbai.length === 0 && (
+              <div className="mt-10 rounded-xl border border-slate-200 bg-white p-6 text-slate-600">
+                Šiuo metu aktyvių darbo pasiūlymų nėra.
+              </div>
+            )}
 
-          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 space-y-8">
             {darbai.map((darbas) => (
               <article
                 key={darbas.id}
-                className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100">
-                    <BriefcaseBusiness
-                      className="h-6 w-6 text-slate-700"
-                      strokeWidth={1.8}
-                    />
-                  </div>
+                <div className="flex flex-wrap items-start justify-between gap-5">
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                        <BriefcaseBusiness
+                          className="h-6 w-6 text-slate-700"
+                          strokeWidth={1.8}
+                        />
+                      </div>
 
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-600">
-                    Norvegija
-                  </span>
-                </div>
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-600">
+                        Norvegija
+                      </span>
+                    </div>
 
-                <h3 className="mt-6 text-2xl font-bold text-slate-900">
-                  {darbas.pavadinimas}
-                </h3>
-
-                <div className="mt-5 space-y-3">
-                  <div className="flex items-center gap-3 text-slate-600">
-                    <MapPin
-                      className="h-5 w-5 shrink-0 text-slate-500"
-                      strokeWidth={1.8}
-                    />
-
-                    <span>
-                      {darbas.miestas}, Norvegija
-                    </span>
+                    <h3 className="mt-5 text-3xl font-bold text-slate-900">
+                      {darbas.pavadinimas}
+                    </h3>
                   </div>
 
                   {darbas.atlyginimas && (
-                    <div className="flex items-center gap-3 text-slate-800">
-                      <Banknote
-                        className="h-5 w-5 shrink-0 text-slate-500"
-                        strokeWidth={1.8}
-                      />
+                    <div className="rounded-xl bg-slate-900 px-5 py-3 text-white">
+                      <div className="flex items-center gap-2">
+                        <Banknote
+                          className="h-5 w-5"
+                          strokeWidth={1.8}
+                        />
 
-                      <span className="font-semibold">
-                        {darbas.atlyginimas}
-                      </span>
+                        <span className="font-bold">
+                          {darbas.atlyginimas}
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
 
+                <div className="mt-6 flex items-center gap-3 border-b border-slate-200 pb-6 text-slate-700">
+                  <MapPin
+                    className="h-5 w-5 shrink-0 text-slate-500"
+                    strokeWidth={1.8}
+                  />
+
+                  <span className="font-semibold">
+                    {darbas.miestas}, Norvegija
+                  </span>
+                </div>
+
+                <div className="mt-7 grid gap-x-10 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
+                  <InfoRow
+                    icon={
+                      <Clock3
+                        className="h-5 w-5"
+                        strokeWidth={1.8}
+                      />
+                    }
+                    label="Darbo grafikas"
+                    value={darbas.grafikas}
+                  />
+
+                  <InfoRow
+                    icon={
+                      <CalendarDays
+                        className="h-5 w-5"
+                        strokeWidth={1.8}
+                      />
+                    }
+                    label="Rotacija"
+                    value={darbas.rotacija}
+                  />
+
+                  <InfoRow
+                    icon={
+                      <Home
+                        className="h-5 w-5"
+                        strokeWidth={1.8}
+                      />
+                    }
+                    label="Apgyvendinimas"
+                    value={darbas.apgyvendinimas}
+                  />
+
+                  <InfoRow
+                    icon={
+                      <Plane
+                        className="h-5 w-5"
+                        strokeWidth={1.8}
+                      />
+                    }
+                    label="Kelionė"
+                    value={darbas.kelione}
+                  />
+
+                  <InfoRow
+                    icon={
+                      <UserRoundCheck
+                        className="h-5 w-5"
+                        strokeWidth={1.8}
+                      />
+                    }
+                    label="Reikalaujama patirtis"
+                    value={darbas.patirtis_reikalavimas}
+                  />
+
+                  <InfoRow
+                    icon={
+                      <Languages
+                        className="h-5 w-5"
+                        strokeWidth={1.8}
+                      />
+                    }
+                    label="Kalbos"
+                    value={darbas.kalba_reikalavimas}
+                  />
+
+                  <InfoRow
+                    icon={
+                      <Car
+                        className="h-5 w-5"
+                        strokeWidth={1.8}
+                      />
+                    }
+                    label="Vairuotojo pažymėjimas"
+                    value={darbas.vairuotojo_pazymejimas}
+                  />
+
+                  <InfoRow
+                    icon={
+                      <CalendarDays
+                        className="h-5 w-5"
+                        strokeWidth={1.8}
+                      />
+                    }
+                    label="Darbo pradžia"
+                    value={darbas.darbo_pradzia}
+                  />
+                </div>
+
                 {darbas.aprasymas && (
-                  <p className="mt-5 flex-1 leading-7 text-slate-600">
-                    {darbas.aprasymas}
-                  </p>
+                  <div className="mt-8 border-t border-slate-200 pt-7">
+                    <h4 className="text-lg font-bold text-slate-900">
+                      Darbo aprašymas
+                    </h4>
+
+                    <p className="mt-3 whitespace-pre-wrap leading-8 text-slate-600">
+                      {darbas.aprasymas}
+                    </p>
+                  </div>
                 )}
 
-                <Link
-                  href={`/registracija?darbas=${darbas.id}`}
-                  className="mt-7 inline-flex items-center justify-center rounded-lg bg-slate-900 px-5 py-3 font-bold text-white transition hover:bg-slate-700"
-                >
-                  Pateikti kandidatūrą
-                </Link>
+                <div className="mt-8">
+                  <Link
+                    href={`/registracija?darbas=${darbas.id}`}
+                    className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-6 py-3 font-bold text-white transition hover:bg-slate-700"
+                  >
+                    Pateikti kandidatūrą
+                  </Link>
+                </div>
               </article>
             ))}
           </div>
