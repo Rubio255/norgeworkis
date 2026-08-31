@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,8 +27,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Norgeworkis | Darbai Norvegijoje",
-    description:
-      "Darbo pasiūlymai Norvegijoje Lietuvos specialistams.",
+    description: "Darbo pasiūlymai Norvegijoje Lietuvos specialistams.",
     url: "https://www.norgeworkis.lt",
     siteName: "Norgeworkis",
     locale: "lt_LT",
@@ -46,7 +46,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="lt">
-      <body>{children}</body>
+      <body>
+        {children}
+
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-62TVFP80X8"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-62TVFP80X8');
+          `}
+        </Script>
+      </body>
     </html>
   );
 }
