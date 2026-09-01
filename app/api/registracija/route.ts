@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createHmac } from "crypto";
 
 export const runtime = "nodejs";
 
 const MAX_CV_SIZE = 10 * 1024 * 1024;
 
-const ALLOWED_CV_EXTENSIONS = ["pdf", "doc", "docx"];
+const ALLOWED_CV_EXTENSIONS = [
+  "pdf",
+  "doc",
+  "docx",
+];
 
 const ALLOWED_CV_TYPES = [
   "application/pdf",
@@ -14,7 +19,13 @@ const ALLOWED_CV_TYPES = [
   "application/octet-stream",
 ];
 
-function cleanText(value: FormDataEntryValue | null, maxLength: number) {
+const RATE_LIMIT_MINUTES = 15;
+const RATE_LIMIT_MAX_REQUESTS = 5;
+
+function cleanText(
+  value: FormDataEntryValue | null,
+  maxLength: number
+) {
   if (typeof value !== "string") {
     return "";
   }
@@ -44,13 +55,57 @@ function sanitizeFileName(fileName: string) {
 }
 
 function getClientIp(request: NextRequest) {
-  const forwardedFor = request.headers.get("x-forwarded-for");
+  const forwardedFor =
+    request.headers.get("x-forwarded-for");
 
   if (forwardedFor) {
-    return forwardedFor.split(",")[0].trim();
+    return forwardedFor
+      .split(",")[0]
+      .trim();
   }
 
-  return request.headers.get("x-real-ip") || "";
+  return (
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
+/*
+ * Tikras IP DB nesaugomas.
+ *
+ * HMAC naudojamas su serverio slaptu raktu,
+ * todėl DB lieka tik vienkryptė hash reikšmė.
+ */
+function hashIp(
+  ip: string,
+  secret: string
+) {
+  return createHmac(
+    "sha256",
+    secret
+  )
+    .update(ip)
+    .digest("hex");
+}
+
+/*
+ * Apskaičiuojame dabartinio
+ * 15 minučių intervalo pradžią.
+ */
+function getRateLimitWindowStart() {
+  const windowMs =
+    RATE_LIMIT_MINUTES *
+    60 *
+    1000;
+
+  const timestamp =
+    Math.floor(
+      Date.now() / windowMs
+    ) * windowMs;
+
+  return new Date(
+    timestamp
+  ).toISOString();
 }
 
 async function verifyTurnstile(
@@ -58,26 +113,45 @@ async function verifyTurnstile(
   ip: string,
   secretKey: string
 ) {
-  const body = new URLSearchParams();
+  const body =
+    new URLSearchParams();
 
-  body.append("secret", secretKey);
-  body.append("response", token);
+  body.append(
+    "secret",
+    secretKey
+  );
 
-  if (ip) {
-    body.append("remoteip", ip);
+  body.append(
+    "response",
+    token
+  );
+
+  if (
+    ip &&
+    ip !== "unknown"
+  ) {
+    body.append(
+      "remoteip",
+      ip
+    );
   }
 
-  const response = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body,
-      cache: "no-store",
-    }
-  );
+  const response =
+    await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded",
+        },
+
+        body,
+
+        cache: "no-store",
+      }
+    );
 
   if (!response.ok) {
     return {
@@ -86,29 +160,40 @@ async function verifyTurnstile(
     };
   }
 
-  const result = await response.json();
+  const result =
+    await response.json();
 
   return {
-    success: result.success === true,
+    success:
+      result.success === true,
+
     hostname:
-      typeof result.hostname === "string"
+      typeof result.hostname ===
+      "string"
         ? result.hostname
         : "",
   };
 }
 
-export async function POST(request: NextRequest) {
-  let uploadedCvPath: string | null = null;
+export async function POST(
+  request: NextRequest
+) {
+  let uploadedCvPath:
+    | string
+    | null = null;
 
   try {
     const supabaseUrl =
-      process.env.NEXT_PUBLIC_SUPABASE_URL;
+      process.env
+        .NEXT_PUBLIC_SUPABASE_URL;
 
     const serviceRoleKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY;
+      process.env
+        .SUPABASE_SERVICE_ROLE_KEY;
 
     const turnstileSecret =
-      process.env.TURNSTILE_SECRET_KEY;
+      process.env
+        .TURNSTILE_SECRET_KEY;
 
     if (
       !supabaseUrl ||
@@ -130,22 +215,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const formData = await request.formData();
+    const formData =
+      await request.formData();
 
     /*
      * HONEYPOT
-     *
-     * Šio lauko normalus žmogus nematys.
-     * Paprasti botai dažnai jį automatiškai užpildo.
      */
-    const website = cleanText(
-      formData.get("website"),
-      200
-    );
+    const website =
+      cleanText(
+        formData.get("website"),
+        200
+      );
 
     if (website) {
       /*
-       * Botui neatskleidžiame, kad jis buvo aptiktas.
+       * Botui neatskleidžiame,
+       * kad jis buvo aptiktas.
        */
       return NextResponse.json({
         success: true,
@@ -153,12 +238,21 @@ export async function POST(request: NextRequest) {
     }
 
     /*
+     * GAUNAME IP
+     */
+    const clientIp =
+      getClientIp(request);
+
+    /*
      * CLOUDFLARE TURNSTILE
      */
-    const turnstileToken = cleanText(
-      formData.get("turnstileToken"),
-      3000
-    );
+    const turnstileToken =
+      cleanText(
+        formData.get(
+          "turnstileToken"
+        ),
+        3000
+      );
 
     if (!turnstileToken) {
       return NextResponse.json(
@@ -172,13 +266,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const clientIp = getClientIp(request);
-
-    const turnstile = await verifyTurnstile(
-      turnstileToken,
-      clientIp,
-      turnstileSecret
-    );
+    const turnstile =
+      await verifyTurnstile(
+        turnstileToken,
+        clientIp,
+        turnstileSecret
+      );
 
     if (!turnstile.success) {
       return NextResponse.json(
@@ -193,11 +286,12 @@ export async function POST(request: NextRequest) {
     }
 
     /*
-     * Production aplinkoje patikriname,
-     * ar Turnstile tokenas skirtas mūsų domenui.
+     * Production aplinkoje
+     * tikriname domeną.
      */
     if (
-      process.env.NODE_ENV === "production" &&
+      process.env.NODE_ENV ===
+        "production" &&
       turnstile.hostname &&
       turnstile.hostname !==
         "www.norgeworkis.lt" &&
@@ -216,93 +310,232 @@ export async function POST(request: NextRequest) {
     }
 
     /*
+     * SUPABASE SERVERIO KLIENTAS
+     */
+    const supabase =
+      createClient(
+        supabaseUrl,
+        serviceRoleKey,
+        {
+          auth: {
+            persistSession:
+              false,
+            autoRefreshToken:
+              false,
+          },
+        }
+      );
+
+    /*
+     * RATE LIMIT
+     *
+     * DB saugomas ne IP,
+     * o jo HMAC hash.
+     */
+    const ipHash =
+      hashIp(
+        clientIp,
+        serviceRoleKey
+      );
+
+    const windowStart =
+      getRateLimitWindowStart();
+
+    const {
+      data: rateLimitData,
+      error: rateLimitError,
+    } = await supabase.rpc(
+      "check_registration_rate_limit",
+      {
+        p_ip_hash:
+          ipHash,
+
+        p_window_start:
+          windowStart,
+
+        p_max_requests:
+          RATE_LIMIT_MAX_REQUESTS,
+      }
+    );
+
+    if (rateLimitError) {
+      console.error(
+        "Rate limit klaida:",
+        rateLimitError.message
+      );
+
+      /*
+       * Jei apsaugos sistema neveikia,
+       * registracijos neleidžiame.
+       */
+      return NextResponse.json(
+        {
+          error:
+            "Laikina apsaugos sistemos klaida. Bandykite vėliau.",
+        },
+        {
+          status: 503,
+        }
+      );
+    }
+
+    const rateLimitResult =
+      Array.isArray(
+        rateLimitData
+      )
+        ? rateLimitData[0]
+        : rateLimitData;
+
+    if (
+      !rateLimitResult ||
+      rateLimitResult.allowed !==
+        true
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Per daug kandidatūros pateikimo bandymų. Palaukite maždaug 15 minučių ir bandykite dar kartą.",
+        },
+        {
+          status: 429,
+        }
+      );
+    }
+
+    /*
      * FORMOS DUOMENYS
      */
-    const vardas = cleanText(
-      formData.get("vardas"),
-      80
-    );
+    const vardas =
+      cleanText(
+        formData.get("vardas"),
+        80
+      );
 
-    const pavarde = cleanText(
-      formData.get("pavarde"),
-      100
-    );
+    const pavarde =
+      cleanText(
+        formData.get(
+          "pavarde"
+        ),
+        100
+      );
 
-    const telefonas = cleanText(
-      formData.get("telefonas"),
-      40
-    );
+    const telefonas =
+      cleanText(
+        formData.get(
+          "telefonas"
+        ),
+        40
+      );
 
-    const email = cleanText(
-      formData.get("email"),
-      180
-    ).toLowerCase();
+    const email =
+      cleanText(
+        formData.get("email"),
+        180
+      ).toLowerCase();
 
-    const profesija = cleanText(
-      formData.get("profesija"),
-      100
-    );
+    const profesija =
+      cleanText(
+        formData.get(
+          "profesija"
+        ),
+        100
+      );
 
-    const patirtis = cleanText(
-      formData.get("patirtis"),
-      100
-    );
+    const patirtis =
+      cleanText(
+        formData.get(
+          "patirtis"
+        ),
+        100
+      );
 
-    const norveguKalba = cleanText(
-      formData.get("norveguKalba"),
-      100
-    );
+    const norveguKalba =
+      cleanText(
+        formData.get(
+          "norveguKalba"
+        ),
+        100
+      );
 
-    const angluKalba = cleanText(
-      formData.get("angluKalba"),
-      100
-    );
+    const angluKalba =
+      cleanText(
+        formData.get(
+          "angluKalba"
+        ),
+        100
+      );
 
-    const apie = cleanText(
-      formData.get("apie"),
-      3000
-    );
+    const apie =
+      cleanText(
+        formData.get("apie"),
+        3000
+      );
 
-    const darbasIdRaw = cleanText(
-      formData.get("darbasId"),
-      30
-    );
+    const darbasIdRaw =
+      cleanText(
+        formData.get(
+          "darbasId"
+        ),
+        30
+      );
 
     /*
      * SERVERINĖ VALIDACIJA
      */
     if (!vardas) {
       return NextResponse.json(
-        { error: "Įveskite vardą." },
-        { status: 400 }
+        {
+          error:
+            "Įveskite vardą.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
     if (!pavarde) {
       return NextResponse.json(
-        { error: "Įveskite pavardę." },
-        { status: 400 }
+        {
+          error:
+            "Įveskite pavardę.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
     if (!telefonas) {
       return NextResponse.json(
-        { error: "Įveskite telefono numerį." },
-        { status: 400 }
+        {
+          error:
+            "Įveskite telefono numerį.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
     if (!email) {
       return NextResponse.json(
-        { error: "Įveskite el. pašto adresą." },
-        { status: 400 }
+        {
+          error:
+            "Įveskite el. pašto adresą.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
     const emailPattern =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailPattern.test(email)) {
+    if (
+      !emailPattern.test(email)
+    ) {
       return NextResponse.json(
         {
           error:
@@ -316,8 +549,13 @@ export async function POST(request: NextRequest) {
 
     if (!profesija) {
       return NextResponse.json(
-        { error: "Pasirinkite profesiją." },
-        { status: 400 }
+        {
+          error:
+            "Pasirinkite profesiją.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
@@ -358,33 +596,20 @@ export async function POST(request: NextRequest) {
     }
 
     /*
-     * SUPABASE SERVERIO KLIENTAS
-     *
-     * Service Role raktas naudojamas TIK serveryje.
+     * DARBO PASIŪLYMO TIKRINIMAS
      */
-    const supabase = createClient(
-      supabaseUrl,
-      serviceRoleKey,
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-        },
-      }
-    );
-
-    /*
-     * Patikriname darbo ID.
-     * Negalima kandidatuoti į neegzistuojantį
-     * arba neaktyvų darbą.
-     */
-    let darbasId: number | null = null;
+    let darbasId:
+      | number
+      | null = null;
 
     if (darbasIdRaw) {
-      const parsedId = Number(darbasIdRaw);
+      const parsedId =
+        Number(darbasIdRaw);
 
       if (
-        !Number.isInteger(parsedId) ||
+        !Number.isInteger(
+          parsedId
+        ) ||
         parsedId <= 0
       ) {
         return NextResponse.json(
@@ -405,7 +630,10 @@ export async function POST(request: NextRequest) {
         .from("darbai")
         .select("id")
         .eq("id", parsedId)
-        .eq("aktyvus", true)
+        .eq(
+          "aktyvus",
+          true
+        )
         .maybeSingle();
 
       if (darbasError) {
@@ -437,21 +665,29 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      darbasId = parsedId;
+      darbasId =
+        parsedId;
     }
 
     /*
      * CV
      */
-    const cvEntry = formData.get("cv");
+    const cvEntry =
+      formData.get("cv");
 
-    let cvPath: string | null = null;
+    let cvPath:
+      | string
+      | null = null;
 
     if (
-      cvEntry instanceof File &&
+      cvEntry instanceof
+        File &&
       cvEntry.size > 0
     ) {
-      if (cvEntry.size > MAX_CV_SIZE) {
+      if (
+        cvEntry.size >
+        MAX_CV_SIZE
+      ) {
         return NextResponse.json(
           {
             error:
@@ -467,7 +703,8 @@ export async function POST(request: NextRequest) {
         cvEntry.name
           .split(".")
           .pop()
-          ?.toLowerCase() || "";
+          ?.toLowerCase() ||
+        "";
 
       if (
         !ALLOWED_CV_EXTENSIONS.includes(
@@ -487,7 +724,9 @@ export async function POST(request: NextRequest) {
 
       if (
         cvEntry.type &&
-        !ALLOWED_CV_TYPES.includes(cvEntry.type)
+        !ALLOWED_CV_TYPES.includes(
+          cvEntry.type
+        )
       ) {
         return NextResponse.json(
           {
@@ -500,9 +739,10 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const safeName = sanitizeFileName(
-        cvEntry.name
-      );
+      const safeName =
+        sanitizeFileName(
+          cvEntry.name
+        );
 
       const randomPart =
         crypto.randomUUID();
@@ -515,7 +755,8 @@ export async function POST(request: NextRequest) {
 
       const {
         error: uploadError,
-      } = await supabase.storage
+      } = await supabase
+        .storage
         .from("cv")
         .upload(
           cvPath,
@@ -524,8 +765,12 @@ export async function POST(request: NextRequest) {
             contentType:
               cvEntry.type ||
               "application/octet-stream",
-            cacheControl: "3600",
-            upsert: false,
+
+            cacheControl:
+              "3600",
+
+            upsert:
+              false,
           }
         );
 
@@ -546,7 +791,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      uploadedCvPath = cvPath;
+      uploadedCvPath =
+        cvPath;
     }
 
     /*
@@ -563,19 +809,36 @@ export async function POST(request: NextRequest) {
         email,
         profesija,
         patirtis,
-        norvegu_kalba: norveguKalba,
-        anglu_kalba: angluKalba,
-        apie: apie || null,
-        cv_path: cvPath,
-        statusas: "Naujas",
-        darbas_id: darbasId,
+
+        norvegu_kalba:
+          norveguKalba,
+
+        anglu_kalba:
+          angluKalba,
+
+        apie:
+          apie || null,
+
+        cv_path:
+          cvPath,
+
+        statusas:
+          "Naujas",
+
+        darbas_id:
+          darbasId,
       });
 
     if (insertError) {
-      if (uploadedCvPath) {
-        await supabase.storage
+      if (
+        uploadedCvPath
+      ) {
+        await supabase
+          .storage
           .from("cv")
-          .remove([uploadedCvPath]);
+          .remove([
+            uploadedCvPath,
+          ]);
       }
 
       console.error(
@@ -596,6 +859,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+
       message:
         "Kandidatūra sėkmingai pateikta.",
     });
