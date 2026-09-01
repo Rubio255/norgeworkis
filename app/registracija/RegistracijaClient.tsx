@@ -21,6 +21,12 @@ type Darbas = {
 
 declare global {
   interface Window {
+    gtag?: (
+      command: "event",
+      eventName: string,
+      eventParams?: Record<string, unknown>
+    ) => void;
+
     turnstile?: {
       render: (
         container: HTMLElement,
@@ -442,6 +448,17 @@ export default function RegistracijaClient() {
       setSuccessMessage(
         "Kandidatūra sėkmingai pateikta."
       );
+
+      // GA4 / Google Ads konversijos įvykis.
+      // Nesiunčiami vardas, el. paštas, telefonas ar kiti asmens duomenys.
+      if (typeof window !== "undefined" && window.gtag) {
+        window.gtag("event", "candidate_registration", {
+          job_id:
+            darbasId && !Number.isNaN(darbasId)
+              ? darbasId
+              : undefined,
+        });
+      }
 
       setVardas("");
       setPavarde("");
