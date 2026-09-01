@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "../../utils/supabase/client";
 
 type Darbas = {
@@ -46,6 +46,7 @@ declare global {
 
 export default function RegistracijaClient() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [supabase] = useState(() => createClient());
 
   const darbasIdParam = searchParams.get("darbas");
@@ -488,6 +489,8 @@ export default function RegistracijaClient() {
       }
 
       resetTurnstile();
+
+      router.push("/registracija-sekminga");
     } catch (error) {
       console.error(
         "Kandidatūros pateikimo klaida:",
