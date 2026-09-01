@@ -733,6 +733,21 @@ export default function AdminPage() {
     setSending(true);
 
     try {
+      const {
+        data: { session },
+        error: sessionError,
+      } =
+        await supabase.auth.getSession();
+
+      if (
+        sessionError ||
+        !session?.access_token
+      ) {
+        throw new Error(
+          "Administratoriaus sesija nebegalioja. Prisijunkite iš naujo."
+        );
+      }
+
       const response =
         await fetch(
           "/api/siusti-darbdaviui",
@@ -742,6 +757,9 @@ export default function AdminPage() {
             headers: {
               "Content-Type":
                 "application/json",
+
+              Authorization:
+                `Bearer ${session.access_token}`,
             },
 
             body: JSON.stringify({
@@ -757,6 +775,15 @@ export default function AdminPage() {
         await response.json();
 
       if (!response.ok) {
+        if (
+          response.status === 401 ||
+          response.status === 403
+        ) {
+          await supabase.auth.signOut();
+
+          setUserEmail(null);
+        }
+
         throw new Error(
           result.error ||
             "Nepavyko išsiųsti kandidatų."
