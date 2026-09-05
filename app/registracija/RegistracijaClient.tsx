@@ -122,7 +122,7 @@ function validatePhone(
     /^\+[1-9]\d{7,14}$/;
 
   if (!phonePattern.test(phone)) {
-    return "Telefono numerį įveskite tarptautiniu formatu, pvz. +37061234567 arba +4791234567.";
+    return "Neteisingas telefono numeris. Naudokite tarptautinį formatą, pvz. +37061234567.";
   }
 
   return null;
@@ -134,7 +134,6 @@ function validateEmail(
   const email =
     value.trim().toLowerCase();
 
-  // EL. PAŠTAS PRIVALOMAS
   if (!email) {
     return "Įveskite el. pašto adresą.";
   }
@@ -536,7 +535,6 @@ export default function RegistracijaClient() {
       return;
     }
 
-    // EL. PAŠTAS PRIVALOMAS
     if (!email.trim()) {
       setErrorMessage(
         "Įveskite el. pašto adresą."
@@ -912,13 +910,11 @@ export default function RegistracijaClient() {
               <div
                 aria-hidden="true"
                 style={{
-                  position:
-                    "absolute",
+                  position: "absolute",
                   left: "-10000px",
                   width: "1px",
                   height: "1px",
-                  overflow:
-                    "hidden",
+                  overflow: "hidden",
                 }}
               >
                 <label htmlFor="website">
@@ -955,10 +951,6 @@ export default function RegistracijaClient() {
                     placeholder="Pvz. Jonas"
                     className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                   />
-
-                  <p className="mt-1.5 text-xs text-slate-500">
-                    Tik vardas, be skaičių ar kitų simbolių.
-                  </p>
                 </div>
 
                 <div>
@@ -980,10 +972,6 @@ export default function RegistracijaClient() {
                     placeholder="+37061234567"
                     className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                   />
-
-                  <p className="mt-1.5 text-xs text-slate-500">
-                    Tarptautinis formatas, pvz. +37061234567 arba +4791234567.
-                  </p>
                 </div>
               </div>
 
@@ -1008,10 +996,6 @@ export default function RegistracijaClient() {
                   placeholder="pvz. jonas@gmail.com"
                   className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                 />
-
-                <p className="mt-1.5 text-xs text-slate-500">
-                  El. paštas privalomas.
-                </p>
               </div>
 
               <div>
@@ -1146,9 +1130,7 @@ export default function RegistracijaClient() {
                   </label>
 
                   <select
-                    value={
-                      norveguKalba
-                    }
+                    value={norveguKalba}
                     onChange={(e) =>
                       setNorveguKalba(
                         e.target.value
@@ -1183,9 +1165,7 @@ export default function RegistracijaClient() {
                   </label>
 
                   <select
-                    value={
-                      angluKalba
-                    }
+                    value={angluKalba}
                     onChange={(e) =>
                       setAngluKalba(
                         e.target.value
@@ -1247,22 +1227,16 @@ export default function RegistracijaClient() {
                   accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   onChange={(e) =>
                     handleCvChange(
-                      e.target
-                        .files?.[0] ||
+                      e.target.files?.[0] ||
                         null
                     )
                   }
                   className="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
                 />
 
-                <p className="mt-2 text-sm text-slate-500">
-                  PDF, DOC arba DOCX. Maksimalus dydis – 10 MB.
-                </p>
-
                 {cv && (
                   <p className="mt-2 text-sm font-semibold text-slate-700">
-                    Pasirinktas failas:{" "}
-                    {cv.name}
+                    Pasirinktas failas: {cv.name}
                   </p>
                 )}
               </div>
