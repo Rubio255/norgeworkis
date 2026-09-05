@@ -44,19 +44,19 @@ type Darbas = {
 function NorgeworkisLogo() {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm">
+      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm sm:h-12 sm:w-12">
         <ShieldCheck
-          className="h-7 w-7 text-slate-900"
+          className="h-6 w-6 text-slate-900 sm:h-7 sm:w-7"
           strokeWidth={1.8}
         />
       </div>
 
       <div>
-        <div className="text-2xl font-black tracking-[0.08em] text-white">
+        <div className="text-xl font-black tracking-[0.08em] text-white sm:text-2xl">
           NORGEWORKIS
         </div>
 
-        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300 sm:text-xs">
           Darbai Norvegijoje
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function Home() {
     <>
       <main className="min-h-screen bg-slate-100">
         <header className="border-b border-slate-800 bg-slate-950">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 sm:py-5">
             <Link href="/">
               <NorgeworkisLogo />
             </Link>
@@ -156,10 +156,10 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="bg-slate-950 px-6 py-20 text-white">
-          <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.4fr_0.6fr] md:items-center">
+        <section className="bg-slate-950 px-4 py-10 text-white sm:px-6 sm:py-16 md:py-20">
+          <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1.4fr_0.6fr] md:items-center md:gap-12">
             <div>
-              <div className="mb-6 flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
+              <div className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 sm:mb-6 sm:text-sm">
                 <BriefcaseBusiness
                   className="h-5 w-5"
                   strokeWidth={1.8}
@@ -168,33 +168,45 @@ export default function Home() {
                 Darbas Norvegijoje
               </div>
 
-              <h1 className="max-w-4xl text-4xl font-bold leading-tight md:text-6xl">
-                Patikimesnis kelias į darbą Norvegijoje
+              <h1 className="max-w-4xl text-3xl font-bold leading-tight sm:text-4xl md:text-6xl">
+                Statybų darbai Norvegijoje
               </h1>
 
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-                Darbo pasiūlymai Lietuvos specialistams, kandidatų
-                registracija ir aiškus kandidatūros pateikimo procesas.
+              <p className="mt-5 max-w-3xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-lg sm:leading-8">
+                Darbo pasiūlymai įvairių statybos sričių
+                darbuotojams. Atlyginimas priklauso nuo
+                patirties ir kvalifikacijos.
               </p>
 
-              <div className="mt-10 flex flex-wrap gap-4">
+              <div className="mt-6 rounded-xl border border-slate-700 bg-slate-900 p-4 sm:mt-8">
+                <p className="font-bold text-white">
+                  Kandidatuoti užtrunka apie 1 minutę.
+                </p>
+
+                <p className="mt-1 text-sm leading-6 text-slate-300">
+                  Užtenka vardo, telefono, profesijos ir
+                  darbo patirties. CV nėra privalomas.
+                </p>
+              </div>
+
+              <div className="mt-7 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
                 <Link
                   href="#darbai"
-                  className="rounded-lg bg-white px-7 py-4 font-bold text-slate-950 transition hover:bg-slate-200"
+                  className="flex w-full items-center justify-center rounded-xl bg-white px-7 py-4 text-center font-bold text-slate-950 transition hover:bg-slate-200 sm:w-auto"
                 >
                   Peržiūrėti darbo pasiūlymus
                 </Link>
 
                 <Link
                   href="/registracija"
-                  className="rounded-lg border border-slate-600 px-7 py-4 font-bold text-white transition hover:border-slate-400 hover:bg-slate-900"
+                  className="flex w-full items-center justify-center rounded-xl border border-slate-600 px-7 py-4 text-center font-bold text-white transition hover:border-slate-400 hover:bg-slate-900 sm:w-auto"
                 >
-                  Registruotis kandidatui
+                  Kandidatuoti dabar
                 </Link>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-7">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 sm:p-7">
               <div className="flex items-start gap-4">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-800">
                   <BriefcaseBusiness
@@ -205,12 +217,12 @@ export default function Home() {
 
                 <div>
                   <h2 className="text-lg font-bold">
-                    Aiškus kandidatavimo procesas
+                    Paprastas kandidatavimas
                   </h2>
 
                   <p className="mt-2 leading-7 text-slate-400">
-                    Pasirinkite tinkamą poziciją, pateikite kandidatūrą ir
-                    laukite informacijos apie tolimesnius atrankos žingsnius.
+                    Pasirinkite darbo pasiūlymą ir užpildykite
+                    trumpą kandidatūros anketą.
                   </p>
                 </div>
               </div>
@@ -230,8 +242,9 @@ export default function Home() {
                     </h2>
 
                     <p className="mt-2 leading-7 text-slate-400">
-                      Kandidatūros gali būti pateikiamos potencialiems
-                      darbdaviams pagal pasirinktą darbo poziciją.
+                      Kandidatūros gali būti perduodamos
+                      potencialiems darbdaviams pagal jūsų
+                      kvalifikaciją ir pasirinktą poziciją.
                     </p>
                   </div>
                 </div>
@@ -242,31 +255,31 @@ export default function Home() {
 
         <section
           id="darbai"
-          className="mx-auto max-w-6xl px-6 py-16"
+          className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16"
         >
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">
               Naujausi pasiūlymai
             </p>
 
-            <h2 className="mt-3 text-4xl font-bold text-slate-900">
+            <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">
               Darbo pasiūlymai
             </h2>
 
-            <p className="mt-4 text-lg leading-8 text-slate-600">
-              Peržiūrėkite aktyvias pozicijas, darbo sąlygas ir pateikite
+            <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+              Peržiūrėkite aktyvias pozicijas ir pateikite
               kandidatūrą tiesiai į pasirinktą darbo pasiūlymą.
             </p>
           </div>
 
           {loading && (
-            <div className="mt-10 rounded-xl border border-slate-200 bg-white p-6 text-slate-600">
+            <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 sm:mt-10">
               Kraunami darbo pasiūlymai...
             </div>
           )}
 
           {errorMessage && (
-            <div className="mt-10 rounded-xl border border-red-200 bg-red-50 p-6 text-red-700">
+            <div className="mt-8 rounded-xl border border-red-200 bg-red-50 p-6 text-red-700 sm:mt-10">
               {errorMessage}
             </div>
           )}
@@ -274,18 +287,18 @@ export default function Home() {
           {!loading &&
             !errorMessage &&
             darbai.length === 0 && (
-              <div className="mt-10 rounded-xl border border-slate-200 bg-white p-6 text-slate-600">
+              <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 sm:mt-10">
                 Šiuo metu aktyvių darbo pasiūlymų nėra.
               </div>
             )}
 
-          <div className="mt-10 space-y-8">
+          <div className="mt-8 space-y-6 sm:mt-10 sm:space-y-8">
             {darbai.map((darbas) => (
               <article
                 key={darbas.id}
-                className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm"
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
               >
-                <div className="flex flex-wrap items-start justify-between gap-5">
+                <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
                   <div>
                     <div className="flex items-center gap-3">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100">
@@ -300,23 +313,32 @@ export default function Home() {
                       </span>
                     </div>
 
-                    <h3 className="mt-5 text-3xl font-bold text-slate-900">
+                    <h3 className="mt-5 text-2xl font-bold text-slate-900 sm:text-3xl">
                       {darbas.pavadinimas}
                     </h3>
                   </div>
 
                   {darbas.atlyginimas && (
-                    <div className="rounded-xl bg-slate-900 px-5 py-3 text-white">
-                      <div className="flex items-center gap-2">
-                        <Banknote
-                          className="h-5 w-5"
-                          strokeWidth={1.8}
-                        />
+                    <div>
+                      <div className="inline-flex rounded-xl bg-slate-900 px-5 py-3 text-white">
+                        <div className="flex items-center gap-2">
+                          <Banknote
+                            className="h-5 w-5"
+                            strokeWidth={1.8}
+                          />
 
-                        <span className="font-bold">
-                          {darbas.atlyginimas}
-                        </span>
+                          <span className="font-bold">
+                            {darbas.atlyginimas}
+                          </span>
+                        </div>
                       </div>
+
+                      <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+                        Atlyginimas priklauso nuo patirties ir
+                        kvalifikacijos. Nurodytas pradinis atlygis
+                        taikomas kandidatams be patirties arba
+                        turintiems mažai patirties.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -330,6 +352,19 @@ export default function Home() {
                   <span className="font-semibold">
                     {darbas.miestas}, Norvegija
                   </span>
+                </div>
+
+                <div className="mt-6 sm:hidden">
+                  <Link
+                    href={`/registracija?darbas=${darbas.id}`}
+                    className="flex w-full items-center justify-center rounded-xl bg-slate-900 px-6 py-4 text-lg font-bold text-white transition hover:bg-slate-700"
+                  >
+                    Kandidatuoti dabar
+                  </Link>
+
+                  <p className="mt-2 text-center text-sm text-slate-500">
+                    Anketos užpildymas trunka apie 1 minutę.
+                  </p>
                 </div>
 
                 {darbas.video_url && (
@@ -449,20 +484,24 @@ export default function Home() {
                   </div>
                 )}
 
-                <div className="mt-8">
+                <div className="mt-8 hidden sm:block">
                   <Link
                     href={`/registracija?darbas=${darbas.id}`}
-                    className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-6 py-3 font-bold text-white transition hover:bg-slate-700"
+                    className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-7 py-4 font-bold text-white transition hover:bg-slate-700"
                   >
-                    Pateikti kandidatūrą
+                    Kandidatuoti dabar
                   </Link>
+
+                  <p className="mt-2 text-sm text-slate-500">
+                    Anketos užpildymas trunka apie 1 minutę.
+                  </p>
                 </div>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="border-y border-slate-200 bg-white px-6 py-14">
+        <section className="border-y border-slate-200 bg-white px-4 py-12 sm:px-6 sm:py-14">
           <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
             <div>
               <BriefcaseBusiness
@@ -471,11 +510,13 @@ export default function Home() {
               />
 
               <h3 className="mt-4 text-lg font-bold text-slate-900">
-                Atrinkti pasiūlymai
+                Įvairios statybų pozicijos
               </h3>
 
               <p className="mt-2 leading-7 text-slate-600">
-                Aktualios darbo pozicijos pagal darbdavių poreikį.
+                Staliai, betonuotojai, apdailininkai,
+                santechnikai, elektrikai ir kitų sričių
+                darbuotojai.
               </p>
             </div>
 
@@ -490,7 +531,8 @@ export default function Home() {
               </h3>
 
               <p className="mt-2 leading-7 text-slate-600">
-                Kandidatūros pateikimas platformoje yra nemokamas.
+                Kandidatūros pateikimas platformoje yra
+                nemokamas.
               </p>
             </div>
 
@@ -501,11 +543,12 @@ export default function Home() {
               />
 
               <h3 className="mt-4 text-lg font-bold text-slate-900">
-                Konkrečios pozicijos
+                Greita registracija
               </h3>
 
               <p className="mt-2 leading-7 text-slate-600">
-                Kandidatuojama tiesiai į pasirinktą darbo pasiūlymą.
+                Pagrindinei anketai užtenka kelių laukų.
+                CV galima pridėti neprivalomai.
               </p>
             </div>
           </div>
