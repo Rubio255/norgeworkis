@@ -5,7 +5,8 @@ import {
 import { createClient } from "@supabase/supabase-js";
 import { createHmac } from "crypto";
 
-export const runtime = "nodejs";
+export const runtime =
+  "nodejs";
 
 const MAX_CV_SIZE =
   10 * 1024 * 1024;
@@ -30,13 +31,150 @@ function cleanText(
   value: FormDataEntryValue | null,
   maxLength: number
 ) {
-  if (typeof value !== "string") {
+  if (
+    typeof value !== "string"
+  ) {
     return "";
   }
 
   return value
     .trim()
     .slice(0, maxLength);
+}
+
+function validateName(
+  value: string,
+  fieldName: string
+) {
+  if (value.length < 2) {
+    return `${fieldName} turi būti bent 2 raidžių.`;
+  }
+
+  if (value.length > 50) {
+    return `${fieldName} per ilgas.`;
+  }
+
+  const namePattern =
+    /^[\p{L}][\p{L}'’ -]*[\p{L}]$/u;
+
+  if (
+    !namePattern.test(value)
+  ) {
+    return `${fieldName} gali būti sudarytas tik iš raidžių, tarpų, brūkšnelio arba apostrofo.`;
+  }
+
+  const lettersOnly =
+    value
+      .toLocaleLowerCase(
+        "lt-LT"
+      )
+      .replace(
+        /[^\p{L}]/gu,
+        ""
+      );
+
+  if (
+    lettersOnly.length >= 3 &&
+    new Set(
+      lettersOnly
+    ).size === 1
+  ) {
+    return `Įveskite tikrą ${fieldName.toLowerCase()}.`;
+  }
+
+  const blockedNames = [
+    "test",
+    "testas",
+    "asdf",
+    "qwerty",
+    "xxx",
+    "xxxx",
+    "abc",
+    "aaaa",
+  ];
+
+  if (
+    blockedNames.includes(
+      lettersOnly
+    )
+  ) {
+    return `Įveskite tikrą ${fieldName.toLowerCase()}.`;
+  }
+
+  return null;
+}
+
+function normalizePhone(
+  value: string
+) {
+  return value.replace(
+    /[\s()-]/g,
+    ""
+  );
+}
+
+function validatePhone(
+  value: string
+) {
+  const phone =
+    normalizePhone(value);
+
+  const phonePattern =
+    /^\+[1-9]\d{7,14}$/;
+
+  if (
+    !phonePattern.test(phone)
+  ) {
+    return "Telefono numerį įveskite tarptautiniu formatu, pvz. +37061234567 arba +4791234567.";
+  }
+
+  return null;
+}
+
+function validateEmail(
+  value: string
+) {
+  if (!value) {
+    return null;
+  }
+
+  if (
+    value.length > 180 ||
+    value.includes(" ") ||
+    value.includes("..")
+  ) {
+    return "Neteisingas el. pašto adresas.";
+  }
+
+  const parts =
+    value.split("@");
+
+  if (parts.length !== 2) {
+    return "Neteisingas el. pašto adresas.";
+  }
+
+  const [localPart, domain] =
+    parts;
+
+  if (
+    !localPart ||
+    !domain ||
+    localPart.startsWith(".") ||
+    localPart.endsWith(".")
+  ) {
+    return "Neteisingas el. pašto adresas.";
+  }
+
+  const emailPattern =
+    /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+  if (
+    !emailPattern.test(value)
+  ) {
+    return "Neteisingas el. pašto adresas.";
+  }
+
+  return null;
 }
 
 function sanitizeFileName(
@@ -49,7 +187,8 @@ function sanitizeFileName(
     parts.length > 1
       ? parts
           .pop()
-          ?.toLowerCase() || ""
+          ?.toLowerCase() ||
+        ""
       : "";
 
   const baseName = parts
@@ -94,10 +233,6 @@ function getClientIp(
   );
 }
 
-/*
- * Tikras IP DB nesaugomas.
- * DB saugomas tik HMAC hash.
- */
 function hashIp(
   ip: string,
   secret: string
@@ -236,9 +371,6 @@ export async function POST(
     const formData =
       await request.formData();
 
-    /*
-     * HONEYPOT
-     */
     const website =
       cleanText(
         formData.get(
@@ -253,15 +385,9 @@ export async function POST(
       });
     }
 
-    /*
-     * IP
-     */
     const clientIp =
       getClientIp(request);
 
-    /*
-     * TURNSTILE
-     */
     const turnstileToken =
       cleanText(
         formData.get(
@@ -323,9 +449,6 @@ export async function POST(
       );
     }
 
-    /*
-     * SUPABASE SERVERIO KLIENTAS
-     */
     const supabase =
       createClient(
         supabaseUrl,
@@ -341,9 +464,6 @@ export async function POST(
         }
       );
 
-    /*
-     * RATE LIMIT
-     */
     const ipHash =
       hashIp(
         clientIp,
@@ -410,9 +530,6 @@ export async function POST(
       );
     }
 
-    /*
-     * FORMOS DUOMENYS
-     */
     const vardas =
       cleanText(
         formData.get(
@@ -429,12 +546,17 @@ export async function POST(
         100
       );
 
-    const telefonas =
+    const telefonasRaw =
       cleanText(
         formData.get(
           "telefonas"
         ),
         40
+      );
+
+    const telefonas =
+      normalizePhone(
+        telefonasRaw
       );
 
     const email =
@@ -493,14 +615,17 @@ export async function POST(
         30
       );
 
-    /*
-     * PRIVALOMI LAUKAI
-     */
-    if (!vardas) {
+    const vardasError =
+      validateName(
+        vardas,
+        "Vardas"
+      );
+
+    if (vardasError) {
       return NextResponse.json(
         {
           error:
-            "Įveskite vardą.",
+            vardasError,
         },
         {
           status: 400,
@@ -508,11 +633,51 @@ export async function POST(
       );
     }
 
-    if (!telefonas) {
+    if (pavarde) {
+      const pavardeError =
+        validateName(
+          pavarde,
+          "Pavardė"
+        );
+
+      if (pavardeError) {
+        return NextResponse.json(
+          {
+            error:
+              pavardeError,
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+    }
+
+    const telefonasError =
+      validatePhone(
+        telefonas
+      );
+
+    if (telefonasError) {
       return NextResponse.json(
         {
           error:
-            "Įveskite telefono numerį.",
+            telefonasError,
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const emailError =
+      validateEmail(email);
+
+    if (emailError) {
+      return NextResponse.json(
+        {
+          error:
+            emailError,
         },
         {
           status: 400,
@@ -544,34 +709,6 @@ export async function POST(
       );
     }
 
-    /*
-     * EL. PAŠTAS NEPRIVALOMAS.
-     * Bet jei įvestas –
-     * patikriname formatą.
-     */
-    const emailPattern =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (
-      email &&
-      !emailPattern.test(
-        email
-      )
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Neteisingas el. pašto adresas.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    /*
-     * DARBO PASIŪLYMAS
-     */
     let darbasId:
       | number
       | null = null;
@@ -648,9 +785,6 @@ export async function POST(
         parsedId;
     }
 
-    /*
-     * CV – NEPRIVALOMAS
-     */
     const cvEntry =
       formData.get("cv");
 
@@ -774,20 +908,13 @@ export async function POST(
         cvPath;
     }
 
-    /*
-     * KANDIDATO ĮRAŠYMAS
-     *
-     * Neprivalomiems tekstiniams
-     * laukams paliekame tuščią
-     * eilutę. Taip veiks net jei
-     * DB stulpelis yra NOT NULL.
-     */
     const {
       error: insertError,
     } = await supabase
       .from("kandidatai")
       .insert({
         vardas,
+
         pavarde:
           pavarde || "",
 
@@ -800,10 +927,12 @@ export async function POST(
         patirtis,
 
         norvegu_kalba:
-          norveguKalba || "",
+          norveguKalba ||
+          "",
 
         anglu_kalba:
-          angluKalba || "",
+          angluKalba ||
+          "",
 
         apie:
           apie || null,
@@ -819,11 +948,6 @@ export async function POST(
       });
 
     if (insertError) {
-      /*
-       * Jeigu CV jau įkeltas,
-       * bet kandidato įrašyti
-       * nepavyko – CV pašaliname.
-       */
       if (uploadedCvPath) {
         await supabase
           .storage

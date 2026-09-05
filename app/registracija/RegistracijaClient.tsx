@@ -45,39 +45,208 @@ declare global {
   }
 }
 
+function validateName(
+  value: string,
+  fieldName: string
+) {
+  const name = value.trim();
+
+  if (name.length < 2) {
+    return `${fieldName} turi būti bent 2 raidžių.`;
+  }
+
+  if (name.length > 50) {
+    return `${fieldName} per ilgas.`;
+  }
+
+  const namePattern =
+    /^[\p{L}][\p{L}'’ -]*[\p{L}]$/u;
+
+  if (!namePattern.test(name)) {
+    return `${fieldName} gali būti sudarytas tik iš raidžių, tarpų, brūkšnelio arba apostrofo.`;
+  }
+
+  const lettersOnly = name
+    .toLocaleLowerCase("lt-LT")
+    .replace(/[^\p{L}]/gu, "");
+
+  if (
+    lettersOnly.length >= 3 &&
+    new Set(lettersOnly).size === 1
+  ) {
+    return `Įveskite tikrą ${fieldName.toLowerCase()}.`;
+  }
+
+  const blockedNames = [
+    "test",
+    "testas",
+    "asdf",
+    "qwerty",
+    "xxx",
+    "xxxx",
+    "abc",
+    "aaaa",
+  ];
+
+  if (
+    blockedNames.includes(
+      lettersOnly
+    )
+  ) {
+    return `Įveskite tikrą ${fieldName.toLowerCase()}.`;
+  }
+
+  return null;
+}
+
+function normalizePhone(
+  value: string
+) {
+  return value.replace(
+    /[\s()-]/g,
+    ""
+  );
+}
+
+function validatePhone(
+  value: string
+) {
+  const phone =
+    normalizePhone(value);
+
+  if (!phone) {
+    return "Įveskite telefono numerį.";
+  }
+
+  const phonePattern =
+    /^\+[1-9]\d{7,14}$/;
+
+  if (!phonePattern.test(phone)) {
+    return "Telefono numerį įveskite tarptautiniu formatu, pvz. +37061234567 arba +4791234567.";
+  }
+
+  return null;
+}
+
+function validateEmail(
+  value: string
+) {
+  const email =
+    value.trim().toLowerCase();
+
+  if (!email) {
+    return null;
+  }
+
+  if (
+    email.length > 180 ||
+    email.includes(" ") ||
+    email.includes("..")
+  ) {
+    return "Neteisingas el. pašto adresas.";
+  }
+
+  const parts =
+    email.split("@");
+
+  if (parts.length !== 2) {
+    return "Neteisingas el. pašto adresas.";
+  }
+
+  const [localPart, domain] =
+    parts;
+
+  if (
+    !localPart ||
+    !domain ||
+    localPart.startsWith(".") ||
+    localPart.endsWith(".")
+  ) {
+    return "Neteisingas el. pašto adresas.";
+  }
+
+  const emailPattern =
+    /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+  if (
+    !emailPattern.test(email)
+  ) {
+    return "Neteisingas el. pašto adresas.";
+  }
+
+  return null;
+}
+
 export default function RegistracijaClient() {
-  const searchParams = useSearchParams();
-  const [supabase] = useState(() => createClient());
+  const searchParams =
+    useSearchParams();
 
-  const darbasIdParam = searchParams.get("darbas");
+  const [supabase] =
+    useState(() =>
+      createClient()
+    );
 
-  const darbasId = darbasIdParam
-    ? Number(darbasIdParam)
-    : null;
+  const darbasIdParam =
+    searchParams.get("darbas");
+
+  const darbasId =
+    darbasIdParam
+      ? Number(darbasIdParam)
+      : null;
 
   const [darbas, setDarbas] =
-    useState<Darbas | null>(null);
+    useState<Darbas | null>(
+      null
+    );
 
-  const [darbasLoading, setDarbasLoading] =
-    useState(false);
+  const [
+    darbasLoading,
+    setDarbasLoading,
+  ] = useState(false);
 
-  const [vardas, setVardas] = useState("");
-  const [pavarde, setPavarde] = useState("");
-  const [telefonas, setTelefonas] = useState("");
-  const [email, setEmail] = useState("");
-  const [profesija, setProfesija] = useState("");
-  const [patirtis, setPatirtis] = useState("");
-
-  const [norveguKalba, setNorveguKalba] =
+  const [vardas, setVardas] =
     useState("");
 
-  const [angluKalba, setAngluKalba] =
+  const [
+    pavarde,
+    setPavarde,
+  ] = useState("");
+
+  const [
+    telefonas,
+    setTelefonas,
+  ] = useState("");
+
+  const [email, setEmail] =
     useState("");
 
-  const [apie, setApie] = useState("");
+  const [
+    profesija,
+    setProfesija,
+  ] = useState("");
+
+  const [
+    patirtis,
+    setPatirtis,
+  ] = useState("");
+
+  const [
+    norveguKalba,
+    setNorveguKalba,
+  ] = useState("");
+
+  const [
+    angluKalba,
+    setAngluKalba,
+  ] = useState("");
+
+  const [apie, setApie] =
+    useState("");
 
   const [cv, setCv] =
-    useState<File | null>(null);
+    useState<File | null>(
+      null
+    );
 
   const [
     sutinkuPrivatumas,
@@ -113,14 +282,17 @@ export default function RegistracijaClient() {
   ] = useState(false);
 
   const turnstileContainerRef =
-    useRef<HTMLDivElement | null>(null);
+    useRef<HTMLDivElement | null>(
+      null
+    );
 
   const turnstileWidgetIdRef =
     useRef<string | null>(null);
 
   const siteKey =
     process.env
-      .NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+      .NEXT_PUBLIC_TURNSTILE_SITE_KEY ||
+    "";
 
   useEffect(() => {
     async function loadJob() {
@@ -175,7 +347,9 @@ export default function RegistracijaClient() {
       return;
     }
 
-    if (turnstileWidgetIdRef.current) {
+    if (
+      turnstileWidgetIdRef.current
+    ) {
       return;
     }
 
@@ -188,21 +362,29 @@ export default function RegistracijaClient() {
           callback: (
             token: string
           ) => {
-            setTurnstileToken(token);
+            setTurnstileToken(
+              token
+            );
             setErrorMessage("");
           },
 
-          "expired-callback": () => {
-            setTurnstileToken("");
-          },
+          "expired-callback":
+            () => {
+              setTurnstileToken(
+                ""
+              );
+            },
 
-          "error-callback": () => {
-            setTurnstileToken("");
+          "error-callback":
+            () => {
+              setTurnstileToken(
+                ""
+              );
 
-            setErrorMessage(
-              "Nepavyko atlikti apsaugos patikrinimo. Bandykite dar kartą."
-            );
-          },
+              setErrorMessage(
+                "Nepavyko atlikti apsaugos patikrinimo. Bandykite dar kartą."
+              );
+            },
 
           theme: "light",
         }
@@ -213,7 +395,8 @@ export default function RegistracijaClient() {
 
     return () => {
       if (
-        window.turnstile?.remove &&
+        window.turnstile
+          ?.remove &&
         turnstileWidgetIdRef.current
       ) {
         window.turnstile.remove(
@@ -242,11 +425,15 @@ export default function RegistracijaClient() {
     }
   }
 
-  function validateCv(file: File) {
+  function validateCv(
+    file: File
+  ) {
     const maxSize =
       10 * 1024 * 1024;
 
-    if (file.size > maxSize) {
+    if (
+      file.size > maxSize
+    ) {
       return "CV failas negali būti didesnis nei 10 MB.";
     }
 
@@ -256,11 +443,12 @@ export default function RegistracijaClient() {
         .pop()
         ?.toLowerCase();
 
-    const allowedExtensions = [
-      "pdf",
-      "doc",
-      "docx",
-    ];
+    const allowedExtensions =
+      [
+        "pdf",
+        "doc",
+        "docx",
+      ];
 
     if (
       !extension ||
@@ -289,9 +477,11 @@ export default function RegistracijaClient() {
 
     if (validationError) {
       setCv(null);
+
       setErrorMessage(
         validationError
       );
+
       return;
     }
 
@@ -306,16 +496,52 @@ export default function RegistracijaClient() {
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (!vardas.trim()) {
+    const vardasError =
+      validateName(
+        vardas,
+        "Vardas"
+      );
+
+    if (vardasError) {
       setErrorMessage(
-        "Įveskite vardą."
+        vardasError
       );
       return;
     }
 
-    if (!telefonas.trim()) {
+    if (pavarde.trim()) {
+      const pavardeError =
+        validateName(
+          pavarde,
+          "Pavardė"
+        );
+
+      if (pavardeError) {
+        setErrorMessage(
+          pavardeError
+        );
+        return;
+      }
+    }
+
+    const telefonasError =
+      validatePhone(
+        telefonas
+      );
+
+    if (telefonasError) {
       setErrorMessage(
-        "Įveskite telefono numerį."
+        telefonasError
+      );
+      return;
+    }
+
+    const emailError =
+      validateEmail(email);
+
+    if (emailError) {
+      setErrorMessage(
+        emailError
       );
       return;
     }
@@ -332,22 +558,6 @@ export default function RegistracijaClient() {
         "Pasirinkite darbo patirtį."
       );
       return;
-    }
-
-    if (email.trim()) {
-      const emailPattern =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (
-        !emailPattern.test(
-          email.trim()
-        )
-      ) {
-        setErrorMessage(
-          "Neteisingas el. pašto adresas."
-        );
-        return;
-      }
     }
 
     if (!sutinkuPrivatumas) {
@@ -369,7 +579,9 @@ export default function RegistracijaClient() {
         validateCv(cv);
 
       if (cvError) {
-        setErrorMessage(cvError);
+        setErrorMessage(
+          cvError
+        );
         return;
       }
     }
@@ -409,12 +621,16 @@ export default function RegistracijaClient() {
 
       formData.append(
         "telefonas",
-        telefonas.trim()
+        normalizePhone(
+          telefonas
+        )
       );
 
       formData.append(
         "email",
-        email.trim()
+        email
+          .trim()
+          .toLowerCase()
       );
 
       formData.append(
@@ -444,7 +660,9 @@ export default function RegistracijaClient() {
 
       if (
         darbasId &&
-        !Number.isNaN(darbasId)
+        !Number.isNaN(
+          darbasId
+        )
       ) {
         formData.append(
           "darbasId",
@@ -471,7 +689,8 @@ export default function RegistracijaClient() {
 
       formData.append(
         "website",
-        honeypotInput?.value || ""
+        honeypotInput?.value ||
+          ""
       );
 
       const response =
@@ -497,10 +716,6 @@ export default function RegistracijaClient() {
         "Kandidatūra sėkmingai pateikta."
       );
 
-      /*
-       * GA4 / Google Ads konversija.
-       * Nesiunčiami asmens duomenys.
-       */
       if (
         typeof window !==
           "undefined" &&
@@ -550,15 +765,12 @@ export default function RegistracijaClient() {
       }
 
       if (honeypotInput) {
-        honeypotInput.value = "";
+        honeypotInput.value =
+          "";
       }
 
       resetTurnstile();
 
-      /*
-       * Patikimas nukreipimas
-       * po sėkmingos registracijos.
-       */
       window.location.assign(
         "/registracija-sekminga"
       );
@@ -702,7 +914,6 @@ export default function RegistracijaClient() {
               }
               className="mt-7 space-y-6"
             >
-              {/* Honeypot – žmogui nematomas */}
               <div
                 aria-hidden="true"
                 style={{
@@ -737,16 +948,24 @@ export default function RegistracijaClient() {
                   <input
                     type="text"
                     required
+                    minLength={2}
+                    maxLength={50}
                     value={vardas}
                     onChange={(e) =>
                       setVardas(
-                        e.target
-                          .value
+                        e.target.value
                       )
                     }
                     autoComplete="given-name"
+                    placeholder="Pvz. Jonas"
                     className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                   />
+
+                  <p className="mt-1.5 text-xs text-slate-500">
+                    Tik vardas, be
+                    skaičių ar kitų
+                    simbolių.
+                  </p>
                 </div>
 
                 <div>
@@ -760,15 +979,20 @@ export default function RegistracijaClient() {
                     value={telefonas}
                     onChange={(e) =>
                       setTelefonas(
-                        e.target
-                          .value
+                        e.target.value
                       )
                     }
                     autoComplete="tel"
                     inputMode="tel"
-                    placeholder="+370..."
+                    placeholder="+37061234567"
                     className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                   />
+
+                  <p className="mt-1.5 text-xs text-slate-500">
+                    Tarptautinis formatas,
+                    pvz. +37061234567
+                    arba +4791234567.
+                  </p>
                 </div>
               </div>
 
@@ -889,16 +1113,16 @@ export default function RegistracijaClient() {
 
                     <input
                       type="text"
-                      value={
-                        pavarde
-                      }
+                      minLength={2}
+                      maxLength={50}
+                      value={pavarde}
                       onChange={(e) =>
                         setPavarde(
-                          e.target
-                            .value
+                          e.target.value
                         )
                       }
                       autoComplete="family-name"
+                      placeholder="Pvz. Jonaitis"
                       className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                     />
                   </div>
@@ -913,15 +1137,16 @@ export default function RegistracijaClient() {
 
                     <input
                       type="email"
+                      maxLength={180}
                       value={email}
                       onChange={(e) =>
                         setEmail(
-                          e.target
-                            .value
+                          e.target.value
                         )
                       }
                       autoComplete="email"
                       inputMode="email"
+                      placeholder="pvz. jonas@gmail.com"
                       className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                     />
                   </div>
@@ -943,8 +1168,7 @@ export default function RegistracijaClient() {
                     }
                     onChange={(e) =>
                       setNorveguKalba(
-                        e.target
-                          .value
+                        e.target.value
                       )
                     }
                     className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
@@ -952,23 +1176,18 @@ export default function RegistracijaClient() {
                     <option value="">
                       Nenurodyta
                     </option>
-
                     <option value="Nekalbu">
                       Nekalbu
                     </option>
-
                     <option value="Pagrindai">
                       Pagrindai
                     </option>
-
                     <option value="Vidutiniškai">
                       Vidutiniškai
                     </option>
-
                     <option value="Gerai">
                       Gerai
                     </option>
-
                     <option value="Laisvai">
                       Laisvai
                     </option>
@@ -989,8 +1208,7 @@ export default function RegistracijaClient() {
                     }
                     onChange={(e) =>
                       setAngluKalba(
-                        e.target
-                          .value
+                        e.target.value
                       )
                     }
                     className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
@@ -998,23 +1216,18 @@ export default function RegistracijaClient() {
                     <option value="">
                       Nenurodyta
                     </option>
-
                     <option value="Nekalbu">
                       Nekalbu
                     </option>
-
                     <option value="Pagrindai">
                       Pagrindai
                     </option>
-
                     <option value="Vidutiniškai">
                       Vidutiniškai
                     </option>
-
                     <option value="Gerai">
                       Gerai
                     </option>
-
                     <option value="Laisvai">
                       Laisvai
                     </option>
