@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "../../utils/supabase/client";
 
 type Darbas = {
@@ -38,6 +38,7 @@ declare global {
           theme?: "light" | "dark" | "auto";
         }
       ) => string;
+
       reset: (widgetId?: string) => void;
       remove?: (widgetId: string) => void;
     };
@@ -46,10 +47,10 @@ declare global {
 
 export default function RegistracijaClient() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [supabase] = useState(() => createClient());
 
   const darbasIdParam = searchParams.get("darbas");
+
   const darbasId = darbasIdParam
     ? Number(darbasIdParam)
     : null;
@@ -66,31 +67,50 @@ export default function RegistracijaClient() {
   const [email, setEmail] = useState("");
   const [profesija, setProfesija] = useState("");
   const [patirtis, setPatirtis] = useState("");
+
   const [norveguKalba, setNorveguKalba] =
     useState("");
+
   const [angluKalba, setAngluKalba] =
     useState("");
+
   const [apie, setApie] = useState("");
 
-  const [cv, setCv] = useState<File | null>(null);
+  const [cv, setCv] =
+    useState<File | null>(null);
 
-  const [sutinkuPrivatumas, setSutinkuPrivatumas] =
+  const [
+    sutinkuPrivatumas,
+    setSutinkuPrivatumas,
+  ] = useState(false);
+
+  const [
+    sutinkuPerdavimas,
+    setSutinkuPerdavimas,
+  ] = useState(false);
+
+  const [loading, setLoading] =
     useState(false);
 
-  const [sutinkuPerdavimas, setSutinkuPerdavimas] =
-    useState(false);
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState("");
 
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] =
-    useState("");
-  const [successMessage, setSuccessMessage] =
-    useState("");
+  const [
+    successMessage,
+    setSuccessMessage,
+  ] = useState("");
 
-  const [turnstileToken, setTurnstileToken] =
-    useState("");
+  const [
+    turnstileToken,
+    setTurnstileToken,
+  ] = useState("");
 
-  const [turnstileScriptLoaded, setTurnstileScriptLoaded] =
-    useState(false);
+  const [
+    turnstileScriptLoaded,
+    setTurnstileScriptLoaded,
+  ] = useState(false);
 
   const turnstileContainerRef =
     useRef<HTMLDivElement | null>(null);
@@ -99,29 +119,34 @@ export default function RegistracijaClient() {
     useRef<string | null>(null);
 
   const siteKey =
-    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+    process.env
+      .NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
 
   useEffect(() => {
     async function loadJob() {
-      if (!darbasId || Number.isNaN(darbasId)) {
+      if (
+        !darbasId ||
+        Number.isNaN(darbasId)
+      ) {
         setDarbas(null);
         return;
       }
 
       setDarbasLoading(true);
 
-      const { data, error } = await supabase
-        .from("darbai")
-        .select(`
-          id,
-          pavadinimas,
-          miestas,
-          atlyginimas,
-          aprasymas
-        `)
-        .eq("id", darbasId)
-        .eq("aktyvus", true)
-        .maybeSingle();
+      const { data, error } =
+        await supabase
+          .from("darbai")
+          .select(`
+            id,
+            pavadinimas,
+            miestas,
+            atlyginimas,
+            aprasymas
+          `)
+          .eq("id", darbasId)
+          .eq("aktyvus", true)
+          .maybeSingle();
 
       if (error) {
         console.error(
@@ -154,33 +179,37 @@ export default function RegistracijaClient() {
       return;
     }
 
-    const widgetId = window.turnstile.render(
-      turnstileContainerRef.current,
-      {
-        sitekey: siteKey,
+    const widgetId =
+      window.turnstile.render(
+        turnstileContainerRef.current,
+        {
+          sitekey: siteKey,
 
-        callback: (token: string) => {
-          setTurnstileToken(token);
-          setErrorMessage("");
-        },
+          callback: (
+            token: string
+          ) => {
+            setTurnstileToken(token);
+            setErrorMessage("");
+          },
 
-        "expired-callback": () => {
-          setTurnstileToken("");
-        },
+          "expired-callback": () => {
+            setTurnstileToken("");
+          },
 
-        "error-callback": () => {
-          setTurnstileToken("");
+          "error-callback": () => {
+            setTurnstileToken("");
 
-          setErrorMessage(
-            "Nepavyko atlikti apsaugos patikrinimo. Bandykite dar kartą."
-          );
-        },
+            setErrorMessage(
+              "Nepavyko atlikti apsaugos patikrinimo. Bandykite dar kartą."
+            );
+          },
 
-        theme: "light",
-      }
-    );
+          theme: "light",
+        }
+      );
 
-    turnstileWidgetIdRef.current = widgetId;
+    turnstileWidgetIdRef.current =
+      widgetId;
 
     return () => {
       if (
@@ -191,10 +220,14 @@ export default function RegistracijaClient() {
           turnstileWidgetIdRef.current
         );
 
-        turnstileWidgetIdRef.current = null;
+        turnstileWidgetIdRef.current =
+          null;
       }
     };
-  }, [turnstileScriptLoaded, siteKey]);
+  }, [
+    turnstileScriptLoaded,
+    siteKey,
+  ]);
 
   function resetTurnstile() {
     setTurnstileToken("");
@@ -210,14 +243,18 @@ export default function RegistracijaClient() {
   }
 
   function validateCv(file: File) {
-    const maxSize = 10 * 1024 * 1024;
+    const maxSize =
+      10 * 1024 * 1024;
 
     if (file.size > maxSize) {
       return "CV failas negali būti didesnis nei 10 MB.";
     }
 
     const extension =
-      file.name.split(".").pop()?.toLowerCase();
+      file.name
+        .split(".")
+        .pop()
+        ?.toLowerCase();
 
     const allowedExtensions = [
       "pdf",
@@ -227,7 +264,9 @@ export default function RegistracijaClient() {
 
     if (
       !extension ||
-      !allowedExtensions.includes(extension)
+      !allowedExtensions.includes(
+        extension
+      )
     ) {
       return "Leidžiami tik PDF, DOC arba DOCX failai.";
     }
@@ -235,7 +274,9 @@ export default function RegistracijaClient() {
     return null;
   }
 
-  function handleCvChange(file: File | null) {
+  function handleCvChange(
+    file: File | null
+  ) {
     setErrorMessage("");
 
     if (!file) {
@@ -243,11 +284,14 @@ export default function RegistracijaClient() {
       return;
     }
 
-    const validationError = validateCv(file);
+    const validationError =
+      validateCv(file);
 
     if (validationError) {
       setCv(null);
-      setErrorMessage(validationError);
+      setErrorMessage(
+        validationError
+      );
       return;
     }
 
@@ -263,27 +307,23 @@ export default function RegistracijaClient() {
     setSuccessMessage("");
 
     if (!vardas.trim()) {
-      setErrorMessage("Įveskite vardą.");
-      return;
-    }
-
-    if (!pavarde.trim()) {
-      setErrorMessage("Įveskite pavardę.");
+      setErrorMessage(
+        "Įveskite vardą."
+      );
       return;
     }
 
     if (!telefonas.trim()) {
-      setErrorMessage("Įveskite telefono numerį.");
-      return;
-    }
-
-    if (!email.trim()) {
-      setErrorMessage("Įveskite el. pašto adresą.");
+      setErrorMessage(
+        "Įveskite telefono numerį."
+      );
       return;
     }
 
     if (!profesija) {
-      setErrorMessage("Pasirinkite profesiją.");
+      setErrorMessage(
+        "Pasirinkite profesiją."
+      );
       return;
     }
 
@@ -294,18 +334,20 @@ export default function RegistracijaClient() {
       return;
     }
 
-    if (!norveguKalba) {
-      setErrorMessage(
-        "Pasirinkite norvegų kalbos lygį."
-      );
-      return;
-    }
+    if (email.trim()) {
+      const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!angluKalba) {
-      setErrorMessage(
-        "Pasirinkite anglų kalbos lygį."
-      );
-      return;
+      if (
+        !emailPattern.test(
+          email.trim()
+        )
+      ) {
+        setErrorMessage(
+          "Neteisingas el. pašto adresas."
+        );
+        return;
+      }
     }
 
     if (!sutinkuPrivatumas) {
@@ -323,7 +365,8 @@ export default function RegistracijaClient() {
     }
 
     if (cv) {
-      const cvError = validateCv(cv);
+      const cvError =
+        validateCv(cv);
 
       if (cvError) {
         setErrorMessage(cvError);
@@ -348,9 +391,11 @@ export default function RegistracijaClient() {
     setLoading(true);
 
     try {
-      const form = e.currentTarget;
+      const form =
+        e.currentTarget;
 
-      const formData = new FormData();
+      const formData =
+        new FormData();
 
       formData.append(
         "vardas",
@@ -429,15 +474,17 @@ export default function RegistracijaClient() {
         honeypotInput?.value || ""
       );
 
-      const response = await fetch(
-        "/api/registracija",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response =
+        await fetch(
+          "/api/registracija",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
-      const result = await response.json();
+      const result =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -450,15 +497,28 @@ export default function RegistracijaClient() {
         "Kandidatūra sėkmingai pateikta."
       );
 
-      // GA4 / Google Ads konversijos įvykis.
-      // Nesiunčiami vardas, el. paštas, telefonas ar kiti asmens duomenys.
-      if (typeof window !== "undefined" && window.gtag) {
-        window.gtag("event", "candidate_registration", {
-          job_id:
-            darbasId && !Number.isNaN(darbasId)
-              ? darbasId
-              : undefined,
-        });
+      /*
+       * GA4 / Google Ads konversija.
+       * Nesiunčiami asmens duomenys.
+       */
+      if (
+        typeof window !==
+          "undefined" &&
+        window.gtag
+      ) {
+        window.gtag(
+          "event",
+          "candidate_registration",
+          {
+            job_id:
+              darbasId &&
+              !Number.isNaN(
+                darbasId
+              )
+                ? darbasId
+                : undefined,
+          }
+        );
       }
 
       setVardas("");
@@ -472,8 +532,13 @@ export default function RegistracijaClient() {
       setApie("");
       setCv(null);
 
-      setSutinkuPrivatumas(false);
-      setSutinkuPerdavimas(false);
+      setSutinkuPrivatumas(
+        false
+      );
+
+      setSutinkuPerdavimas(
+        false
+      );
 
       const fileInput =
         document.getElementById(
@@ -490,15 +555,25 @@ export default function RegistracijaClient() {
 
       resetTurnstile();
 
-      router.push("/registracija-sekminga");
+      /*
+       * Patikimas nukreipimas
+       * po sėkmingos registracijos.
+       */
+      window.location.assign(
+        "/registracija-sekminga"
+      );
     } catch (error) {
       console.error(
         "Kandidatūros pateikimo klaida:",
         error
       );
 
-      if (error instanceof Error) {
-        setErrorMessage(error.message);
+      if (
+        error instanceof Error
+      ) {
+        setErrorMessage(
+          error.message
+        );
       } else {
         setErrorMessage(
           "Nepavyko pateikti kandidatūros. Bandykite dar kartą."
@@ -517,12 +592,14 @@ export default function RegistracijaClient() {
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         strategy="afterInteractive"
         onLoad={() =>
-          setTurnstileScriptLoaded(true)
+          setTurnstileScriptLoaded(
+            true
+          )
         }
       />
 
       <main className="min-h-screen bg-slate-100">
-        <header className="border-b border-slate-200 bg-white px-6 py-5">
+        <header className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5">
           <div className="mx-auto flex max-w-4xl items-center justify-between">
             <Link
               href="/"
@@ -540,28 +617,42 @@ export default function RegistracijaClient() {
           </div>
         </header>
 
-        <div className="mx-auto max-w-3xl px-6 py-12">
-          <div className="rounded-2xl bg-white p-8 shadow-sm md:p-10">
+        <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-12">
+          <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-8 md:p-10">
             <div>
               <p className="text-sm font-bold uppercase tracking-wider text-sky-700">
                 Kandidato anketa
               </p>
 
-              <h1 className="mt-2 text-3xl font-bold text-slate-950">
-                Kandidatuokite į darbą Norvegijoje
+              <h1 className="mt-2 text-2xl font-bold text-slate-950 sm:text-3xl">
+                Kandidatuokite į darbą
+                Norvegijoje
               </h1>
 
-              <p className="mt-3 leading-7 text-slate-600">
-                Užpildykite kandidato anketą.
-                Jei turite CV, galite jį pridėti.
-                Kandidatūros pateikimas yra
-                nemokamas.
-              </p>
+              <div className="mt-4 rounded-xl bg-sky-50 p-4">
+                <p className="font-bold text-slate-900">
+                  Užpildymas trunka apie
+                  1 minutę.
+                </p>
+
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  Įveskite pagrindinę
+                  informaciją. CV ir
+                  papildoma informacija
+                  nėra privalomi.
+                </p>
+
+                <p className="mt-2 font-bold text-sky-700">
+                  Su jumis nedelsdami
+                  susisieksime.
+                </p>
+              </div>
             </div>
 
             {darbasLoading && (
               <div className="mt-6 rounded-xl bg-slate-100 p-5 text-slate-600">
-                Kraunamas darbo pasiūlymas...
+                Kraunamas darbo
+                pasiūlymas...
               </div>
             )}
 
@@ -573,7 +664,9 @@ export default function RegistracijaClient() {
                   </p>
 
                   <h2 className="mt-2 text-xl font-bold text-slate-900">
-                    {darbas.pavadinimas}
+                    {
+                      darbas.pavadinimas
+                    }
                   </h2>
 
                   <p className="mt-1 text-slate-600">
@@ -604,18 +697,22 @@ export default function RegistracijaClient() {
             )}
 
             <form
-              onSubmit={handleSubmit}
-              className="mt-8 space-y-7"
+              onSubmit={
+                handleSubmit
+              }
+              className="mt-7 space-y-6"
             >
-              {/* HONEYPOT – žmogui nematomas */}
+              {/* Honeypot – žmogui nematomas */}
               <div
                 aria-hidden="true"
                 style={{
-                  position: "absolute",
+                  position:
+                    "absolute",
                   left: "-10000px",
                   width: "1px",
                   height: "1px",
-                  overflow: "hidden",
+                  overflow:
+                    "hidden",
                 }}
               >
                 <label htmlFor="website">
@@ -643,30 +740,12 @@ export default function RegistracijaClient() {
                     value={vardas}
                     onChange={(e) =>
                       setVardas(
-                        e.target.value
+                        e.target
+                          .value
                       )
                     }
                     autoComplete="given-name"
-                    className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
-                    Pavardė *
-                  </label>
-
-                  <input
-                    type="text"
-                    required
-                    value={pavarde}
-                    onChange={(e) =>
-                      setPavarde(
-                        e.target.value
-                      )
-                    }
-                    autoComplete="family-name"
-                    className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                   />
                 </div>
 
@@ -681,31 +760,14 @@ export default function RegistracijaClient() {
                     value={telefonas}
                     onChange={(e) =>
                       setTelefonas(
-                        e.target.value
+                        e.target
+                          .value
                       )
                     }
                     autoComplete="tel"
+                    inputMode="tel"
                     placeholder="+370..."
-                    className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
-                    El. paštas *
-                  </label>
-
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) =>
-                      setEmail(
-                        e.target.value
-                      )
-                    }
-                    autoComplete="email"
-                    className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                   />
                 </div>
               </div>
@@ -723,35 +785,45 @@ export default function RegistracijaClient() {
                       e.target.value
                     )
                   }
-                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-slate-500"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
                 >
                   <option value="">
-                    Pasirinkite profesiją
+                    Pasirinkite
+                    profesiją
                   </option>
+
                   <option value="Stalius">
                     Stalius
                   </option>
+
                   <option value="Betonuotojas">
                     Betonuotojas
                   </option>
+
                   <option value="Elektrikas">
                     Elektrikas
                   </option>
+
                   <option value="Suvirintojas">
                     Suvirintojas
                   </option>
+
                   <option value="Santechnikas">
                     Santechnikas
                   </option>
+
                   <option value="Dažytojas">
                     Dažytojas
                   </option>
+
                   <option value="Mechanikas">
                     Mechanikas
                   </option>
+
                   <option value="Vairuotojas">
                     Vairuotojas
                   </option>
+
                   <option value="Kita">
                     Kita
                   </option>
@@ -771,60 +843,132 @@ export default function RegistracijaClient() {
                       e.target.value
                     )
                   }
-                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-slate-500"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
                 >
                   <option value="">
                     Pasirinkite
                   </option>
+
                   <option value="Be patirties">
                     Be patirties
                   </option>
+
                   <option value="Iki 1 metų">
                     Iki 1 metų
                   </option>
+
                   <option value="1–3 metai">
                     1–3 metai
                   </option>
+
                   <option value="3–5 metai">
                     3–5 metai
                   </option>
+
                   <option value="Daugiau nei 5 metai">
-                    Daugiau nei 5 metai
+                    Daugiau nei 5
+                    metai
                   </option>
                 </select>
+              </div>
+
+              <div className="border-t border-slate-200 pt-6">
+                <p className="mb-5 text-sm font-bold uppercase tracking-wider text-slate-500">
+                  Papildoma informacija
+                  – neprivaloma
+                </p>
+
+                <div className="grid gap-5 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block font-semibold text-slate-700">
+                      Pavardė{" "}
+                      <span className="font-normal text-slate-400">
+                        (neprivaloma)
+                      </span>
+                    </label>
+
+                    <input
+                      type="text"
+                      value={
+                        pavarde
+                      }
+                      onChange={(e) =>
+                        setPavarde(
+                          e.target
+                            .value
+                        )
+                      }
+                      autoComplete="family-name"
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block font-semibold text-slate-700">
+                      El. paštas{" "}
+                      <span className="font-normal text-slate-400">
+                        (neprivaloma)
+                      </span>
+                    </label>
+
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) =>
+                        setEmail(
+                          e.target
+                            .value
+                        )
+                      }
+                      autoComplete="email"
+                      inputMode="email"
+                      className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block font-semibold text-slate-700">
-                    Norvegų kalba *
+                    Norvegų kalba{" "}
+                    <span className="font-normal text-slate-400">
+                      (neprivaloma)
+                    </span>
                   </label>
 
                   <select
-                    required
-                    value={norveguKalba}
+                    value={
+                      norveguKalba
+                    }
                     onChange={(e) =>
                       setNorveguKalba(
-                        e.target.value
+                        e.target
+                          .value
                       )
                     }
-                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-slate-500"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
                   >
                     <option value="">
-                      Pasirinkite
+                      Nenurodyta
                     </option>
+
                     <option value="Nekalbu">
                       Nekalbu
                     </option>
+
                     <option value="Pagrindai">
                       Pagrindai
                     </option>
+
                     <option value="Vidutiniškai">
                       Vidutiniškai
                     </option>
+
                     <option value="Gerai">
                       Gerai
                     </option>
+
                     <option value="Laisvai">
                       Laisvai
                     </option>
@@ -833,34 +977,44 @@ export default function RegistracijaClient() {
 
                 <div>
                   <label className="mb-2 block font-semibold text-slate-700">
-                    Anglų kalba *
+                    Anglų kalba{" "}
+                    <span className="font-normal text-slate-400">
+                      (neprivaloma)
+                    </span>
                   </label>
 
                   <select
-                    required
-                    value={angluKalba}
+                    value={
+                      angluKalba
+                    }
                     onChange={(e) =>
                       setAngluKalba(
-                        e.target.value
+                        e.target
+                          .value
                       )
                     }
-                    className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-slate-500"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
                   >
                     <option value="">
-                      Pasirinkite
+                      Nenurodyta
                     </option>
+
                     <option value="Nekalbu">
                       Nekalbu
                     </option>
+
                     <option value="Pagrindai">
                       Pagrindai
                     </option>
+
                     <option value="Vidutiniškai">
                       Vidutiniškai
                     </option>
+
                     <option value="Gerai">
                       Gerai
                     </option>
+
                     <option value="Laisvai">
                       Laisvai
                     </option>
@@ -870,17 +1024,22 @@ export default function RegistracijaClient() {
 
               <div>
                 <label className="mb-2 block font-semibold text-slate-700">
-                  Trumpai apie save
+                  Trumpai apie save{" "}
+                  <span className="font-normal text-slate-400">
+                    (neprivaloma)
+                  </span>
                 </label>
 
                 <textarea
-                  rows={5}
+                  rows={4}
                   value={apie}
                   onChange={(e) =>
-                    setApie(e.target.value)
+                    setApie(
+                      e.target.value
+                    )
                   }
-                  placeholder="Trumpai aprašykite savo darbo patirtį, kvalifikaciją ar kitą svarbią informaciją."
-                  className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-slate-500"
+                  placeholder="Patirtis, kvalifikacija ar kita svarbi informacija."
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
                 />
               </div>
 
@@ -889,7 +1048,10 @@ export default function RegistracijaClient() {
                   htmlFor="cv"
                   className="mb-2 block font-semibold text-slate-700"
                 >
-                  CV
+                  CV{" "}
+                  <span className="font-normal text-slate-400">
+                    (neprivaloma)
+                  </span>
                 </label>
 
                 <input
@@ -898,16 +1060,17 @@ export default function RegistracijaClient() {
                   accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   onChange={(e) =>
                     handleCvChange(
-                      e.target.files?.[0] ||
+                      e.target
+                        .files?.[0] ||
                         null
                     )
                   }
-                  className="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3"
+                  className="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
                 />
 
                 <p className="mt-2 text-sm text-slate-500">
-                  Neprivaloma. PDF, DOC arba
-                  DOCX. Maksimalus dydis –
+                  PDF, DOC arba DOCX.
+                  Maksimalus dydis –
                   10 MB.
                 </p>
 
@@ -929,10 +1092,11 @@ export default function RegistracijaClient() {
                     }
                     onChange={(e) =>
                       setSutinkuPrivatumas(
-                        e.target.checked
+                        e.target
+                          .checked
                       )
                     }
-                    className="mt-1 h-4 w-4"
+                    className="mt-1 h-5 w-5 shrink-0"
                   />
 
                   <span className="text-sm leading-6 text-slate-600">
@@ -943,7 +1107,8 @@ export default function RegistracijaClient() {
                       target="_blank"
                       className="font-semibold text-sky-700 underline"
                     >
-                      privatumo politika
+                      privatumo
+                      politika
                     </Link>
                     .
                   </span>
@@ -958,10 +1123,11 @@ export default function RegistracijaClient() {
                     }
                     onChange={(e) =>
                       setSutinkuPerdavimas(
-                        e.target.checked
+                        e.target
+                          .checked
                       )
                     }
-                    className="mt-1 h-4 w-4"
+                    className="mt-1 h-5 w-5 shrink-0"
                   />
 
                   <span className="text-sm leading-6 text-slate-600">
@@ -970,8 +1136,8 @@ export default function RegistracijaClient() {
                     duomenys ir, jei
                     pateiktas, CV būtų
                     naudojami kandidatūros
-                    administravimui ir galėtų
-                    būti perduoti
+                    administravimui ir
+                    galėtų būti perduoti
                     potencialiems
                     darbdaviams dėl mano
                     pasirinktos arba mano
@@ -984,14 +1150,15 @@ export default function RegistracijaClient() {
 
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <p className="mb-3 text-sm text-slate-600">
-                  Apsaugos nuo automatinių
-                  užklausų patikrinimas
+                  Apsaugos nuo
+                  automatinių užklausų
+                  patikrinimas
                 </p>
 
                 {!siteKey ? (
                   <p className="text-sm font-semibold text-red-600">
-                    Trūksta Turnstile Site
-                    Key.
+                    Trūksta Turnstile
+                    Site Key.
                   </p>
                 ) : (
                   <div
@@ -1008,16 +1175,17 @@ export default function RegistracijaClient() {
                   loading ||
                   !turnstileToken
                 }
-                className="w-full rounded-xl bg-slate-950 px-6 py-4 font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-xl bg-slate-950 px-6 py-4 text-lg font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading
-                  ? "Pateikiama..."
-                  : "Pateikti kandidatūrą"}
+                  ? "Siunčiama..."
+                  : "Kandidatuoti dabar"}
               </button>
 
               <p className="text-center text-sm text-slate-500">
-                Kandidatūros pateikimas
-                kandidatui yra nemokamas.
+                Kandidatūros
+                pateikimas kandidatui
+                yra nemokamas.
               </p>
             </form>
           </div>

@@ -1,10 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import {
+  NextRequest,
+  NextResponse,
+} from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createHmac } from "crypto";
 
 export const runtime = "nodejs";
 
-const MAX_CV_SIZE = 10 * 1024 * 1024;
+const MAX_CV_SIZE =
+  10 * 1024 * 1024;
 
 const ALLOWED_CV_EXTENSIONS = [
   "pdf",
@@ -30,33 +34,52 @@ function cleanText(
     return "";
   }
 
-  return value.trim().slice(0, maxLength);
+  return value
+    .trim()
+    .slice(0, maxLength);
 }
 
-function sanitizeFileName(fileName: string) {
-  const parts = fileName.split(".");
+function sanitizeFileName(
+  fileName: string
+) {
+  const parts =
+    fileName.split(".");
 
   const extension =
     parts.length > 1
-      ? parts.pop()?.toLowerCase() || ""
+      ? parts
+          .pop()
+          ?.toLowerCase() || ""
       : "";
 
   const baseName = parts
     .join(".")
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+    .replace(
+      /[^a-zA-Z0-9_-]/g,
+      "_"
+    )
     .replace(/_+/g, "_")
     .slice(0, 80);
 
   return extension
-    ? `${baseName || "cv"}.${extension}`
+    ? `${
+        baseName || "cv"
+      }.${extension}`
     : baseName || "cv";
 }
 
-function getClientIp(request: NextRequest) {
+function getClientIp(
+  request: NextRequest
+) {
   const forwardedFor =
-    request.headers.get("x-forwarded-for");
+    request.headers.get(
+      "x-forwarded-for"
+    );
 
   if (forwardedFor) {
     return forwardedFor
@@ -65,16 +88,15 @@ function getClientIp(request: NextRequest) {
   }
 
   return (
-    request.headers.get("x-real-ip") ||
-    "unknown"
+    request.headers.get(
+      "x-real-ip"
+    ) || "unknown"
   );
 }
 
 /*
  * Tikras IP DB nesaugomas.
- *
- * HMAC naudojamas su serverio slaptu raktu,
- * todėl DB lieka tik vienkryptė hash reikšmė.
+ * DB saugomas tik HMAC hash.
  */
 function hashIp(
   ip: string,
@@ -88,10 +110,6 @@ function hashIp(
     .digest("hex");
 }
 
-/*
- * Apskaičiuojame dabartinio
- * 15 minučių intervalo pradžią.
- */
 function getRateLimitWindowStart() {
   const windowMs =
     RATE_LIMIT_MINUTES *
@@ -223,28 +241,26 @@ export async function POST(
      */
     const website =
       cleanText(
-        formData.get("website"),
+        formData.get(
+          "website"
+        ),
         200
       );
 
     if (website) {
-      /*
-       * Botui neatskleidžiame,
-       * kad jis buvo aptiktas.
-       */
       return NextResponse.json({
         success: true,
       });
     }
 
     /*
-     * GAUNAME IP
+     * IP
      */
     const clientIp =
       getClientIp(request);
 
     /*
-     * CLOUDFLARE TURNSTILE
+     * TURNSTILE
      */
     const turnstileToken =
       cleanText(
@@ -273,7 +289,9 @@ export async function POST(
         turnstileSecret
       );
 
-    if (!turnstile.success) {
+    if (
+      !turnstile.success
+    ) {
       return NextResponse.json(
         {
           error:
@@ -285,10 +303,6 @@ export async function POST(
       );
     }
 
-    /*
-     * Production aplinkoje
-     * tikriname domeną.
-     */
     if (
       process.env.NODE_ENV ===
         "production" &&
@@ -320,6 +334,7 @@ export async function POST(
           auth: {
             persistSession:
               false,
+
             autoRefreshToken:
               false,
           },
@@ -328,9 +343,6 @@ export async function POST(
 
     /*
      * RATE LIMIT
-     *
-     * DB saugomas ne IP,
-     * o jo HMAC hash.
      */
     const ipHash =
       hashIp(
@@ -364,10 +376,6 @@ export async function POST(
         rateLimitError.message
       );
 
-      /*
-       * Jei apsaugos sistema neveikia,
-       * registracijos neleidžiame.
-       */
       return NextResponse.json(
         {
           error:
@@ -407,7 +415,9 @@ export async function POST(
      */
     const vardas =
       cleanText(
-        formData.get("vardas"),
+        formData.get(
+          "vardas"
+        ),
         80
       );
 
@@ -429,7 +439,9 @@ export async function POST(
 
     const email =
       cleanText(
-        formData.get("email"),
+        formData.get(
+          "email"
+        ),
         180
       ).toLowerCase();
 
@@ -467,7 +479,9 @@ export async function POST(
 
     const apie =
       cleanText(
-        formData.get("apie"),
+        formData.get(
+          "apie"
+        ),
         3000
       );
 
@@ -480,7 +494,7 @@ export async function POST(
       );
 
     /*
-     * SERVERINĖ VALIDACIJA
+     * PRIVALOMI LAUKAI
      */
     if (!vardas) {
       return NextResponse.json(
@@ -494,52 +508,11 @@ export async function POST(
       );
     }
 
-    if (!pavarde) {
-      return NextResponse.json(
-        {
-          error:
-            "Įveskite pavardę.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
     if (!telefonas) {
       return NextResponse.json(
         {
           error:
             "Įveskite telefono numerį.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    if (!email) {
-      return NextResponse.json(
-        {
-          error:
-            "Įveskite el. pašto adresą.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const emailPattern =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (
-      !emailPattern.test(email)
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Neteisingas el. pašto adresas.",
         },
         {
           status: 400,
@@ -571,23 +544,24 @@ export async function POST(
       );
     }
 
-    if (!norveguKalba) {
-      return NextResponse.json(
-        {
-          error:
-            "Pasirinkite norvegų kalbos lygį.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
+    /*
+     * EL. PAŠTAS NEPRIVALOMAS.
+     * Bet jei įvestas –
+     * patikriname formatą.
+     */
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!angluKalba) {
+    if (
+      email &&
+      !emailPattern.test(
+        email
+      )
+    ) {
       return NextResponse.json(
         {
           error:
-            "Pasirinkite anglų kalbos lygį.",
+            "Neteisingas el. pašto adresas.",
         },
         {
           status: 400,
@@ -596,7 +570,7 @@ export async function POST(
     }
 
     /*
-     * DARBO PASIŪLYMO TIKRINIMAS
+     * DARBO PASIŪLYMAS
      */
     let darbasId:
       | number
@@ -604,7 +578,9 @@ export async function POST(
 
     if (darbasIdRaw) {
       const parsedId =
-        Number(darbasIdRaw);
+        Number(
+          darbasIdRaw
+        );
 
       if (
         !Number.isInteger(
@@ -629,7 +605,10 @@ export async function POST(
       } = await supabase
         .from("darbai")
         .select("id")
-        .eq("id", parsedId)
+        .eq(
+          "id",
+          parsedId
+        )
         .eq(
           "aktyvus",
           true
@@ -670,7 +649,7 @@ export async function POST(
     }
 
     /*
-     * CV
+     * CV – NEPRIVALOMAS
      */
     const cvEntry =
       formData.get("cv");
@@ -797,6 +776,11 @@ export async function POST(
 
     /*
      * KANDIDATO ĮRAŠYMAS
+     *
+     * Neprivalomiems tekstiniams
+     * laukams paliekame tuščią
+     * eilutę. Taip veiks net jei
+     * DB stulpelis yra NOT NULL.
      */
     const {
       error: insertError,
@@ -804,17 +788,22 @@ export async function POST(
       .from("kandidatai")
       .insert({
         vardas,
-        pavarde,
+        pavarde:
+          pavarde || "",
+
         telefonas,
-        email,
+
+        email:
+          email || "",
+
         profesija,
         patirtis,
 
         norvegu_kalba:
-          norveguKalba,
+          norveguKalba || "",
 
         anglu_kalba:
-          angluKalba,
+          angluKalba || "",
 
         apie:
           apie || null,
@@ -830,9 +819,12 @@ export async function POST(
       });
 
     if (insertError) {
-      if (
-        uploadedCvPath
-      ) {
+      /*
+       * Jeigu CV jau įkeltas,
+       * bet kandidato įrašyti
+       * nepavyko – CV pašaliname.
+       */
+      if (uploadedCvPath) {
         await supabase
           .storage
           .from("cv")
