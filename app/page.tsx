@@ -97,21 +97,31 @@ function InfoRow({
 }
 
 export default function Home() {
-  const [supabase] = useState(() => createClient());
+  const [supabase] = useState(() =>
+    createClient()
+  );
 
-  const [darbai, setDarbai] = useState<Darbas[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [darbai, setDarbai] =
+    useState<Darbas[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState("");
 
   useEffect(() => {
     async function loadJobs() {
-      const { data, error } = await supabase
-        .from("darbai")
-        .select("*")
-        .eq("aktyvus", true)
-        .order("created_at", {
-          ascending: false,
-        });
+      const { data, error } =
+        await supabase
+          .from("darbai")
+          .select("*")
+          .eq("aktyvus", true)
+          .order("created_at", {
+            ascending: false,
+          });
 
       if (error) {
         setErrorMessage(
@@ -122,12 +132,25 @@ export default function Home() {
         return;
       }
 
-      setDarbai((data || []) as Darbas[]);
+      setDarbai(
+        (data || []) as Darbas[]
+      );
+
       setLoading(false);
     }
 
     loadJobs();
   }, [supabase]);
+
+  const pagrindinisDarbas =
+    darbai.length > 0
+      ? darbai[0]
+      : null;
+
+  const pagrindineRegistracija =
+    pagrindinisDarbas
+      ? `/registracija?darbas=${pagrindinisDarbas.id}`
+      : "/registracija";
 
   return (
     <>
@@ -147,7 +170,9 @@ export default function Home() {
               </Link>
 
               <Link
-                href="/registracija"
+                href={
+                  pagrindineRegistracija
+                }
                 className="text-sm font-semibold text-slate-300 transition hover:text-white"
               >
                 Kandidatams
@@ -156,10 +181,10 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="bg-slate-950 px-4 py-10 text-white sm:px-6 sm:py-16 md:py-20">
-          <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1.4fr_0.6fr] md:items-center md:gap-12">
-            <div>
-              <div className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 sm:mb-6 sm:text-sm">
+        <section className="bg-slate-950 px-4 py-8 text-white sm:px-6 sm:py-12 md:py-16">
+          <div className="mx-auto max-w-6xl">
+            <div className="mx-auto max-w-4xl text-center">
+              <div className="mb-4 flex items-center justify-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 sm:text-sm">
                 <BriefcaseBusiness
                   className="h-5 w-5"
                   strokeWidth={1.8}
@@ -168,86 +193,69 @@ export default function Home() {
                 Darbas Norvegijoje
               </div>
 
-              <h1 className="max-w-4xl text-3xl font-bold leading-tight sm:text-4xl md:text-6xl">
-                Statybų darbai Norvegijoje
+              <h1 className="text-3xl font-bold leading-tight sm:text-4xl md:text-6xl">
+                Statybų darbai
+                Norvegijoje
               </h1>
 
-              <p className="mt-5 max-w-3xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-lg sm:leading-8">
-                Darbo pasiūlymai įvairių statybos sričių
-                darbuotojams. Atlyginimas priklauso nuo
-                patirties ir kvalifikacijos.
+              <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-slate-300 sm:mt-5 sm:text-lg sm:leading-8">
+                Darbo pasiūlymai įvairių
+                statybos sričių
+                darbuotojams. Atlyginimas
+                priklauso nuo patirties ir
+                kvalifikacijos.
               </p>
+            </div>
 
-              <div className="mt-6 rounded-xl border border-slate-700 bg-slate-900 p-4 sm:mt-8">
+            {pagrindinisDarbas?.video_url && (
+              <div className="mx-auto mt-7 max-w-4xl overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-2xl sm:mt-9">
+                <video
+                  src={
+                    pagrindinisDarbas.video_url
+                  }
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                  preload="metadata"
+                  className="aspect-video w-full object-cover"
+                />
+              </div>
+            )}
+
+            <div className="mx-auto mt-6 max-w-4xl">
+              <div className="rounded-xl border border-slate-700 bg-slate-900 p-4 text-center sm:p-5">
                 <p className="font-bold text-white">
-                  Kandidatuoti užtrunka apie 1 minutę.
+                  Kandidatuoti užtrunka
+                  apie 1 minutę.
                 </p>
 
                 <p className="mt-1 text-sm leading-6 text-slate-300">
-                  Užtenka vardo, telefono, profesijos ir
-                  darbo patirties. CV nėra privalomas.
+                  Užtenka vardo,
+                  telefono, el. pašto,
+                  profesijos ir darbo
+                  patirties. CV nėra
+                  privalomas.
                 </p>
               </div>
 
-              <div className="mt-7 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4">
+              <div className="mt-5 flex flex-col items-stretch justify-center gap-3 sm:flex-row">
                 <Link
-                  href="#darbai"
-                  className="flex w-full items-center justify-center rounded-xl bg-white px-7 py-4 text-center font-bold text-slate-950 transition hover:bg-slate-200 sm:w-auto"
-                >
-                  Peržiūrėti darbo pasiūlymus
-                </Link>
-
-                <Link
-                  href="/registracija"
-                  className="flex w-full items-center justify-center rounded-xl border border-slate-600 px-7 py-4 text-center font-bold text-white transition hover:border-slate-400 hover:bg-slate-900 sm:w-auto"
+                  href={
+                    pagrindineRegistracija
+                  }
+                  className="flex items-center justify-center rounded-xl bg-white px-8 py-4 text-center text-lg font-bold text-slate-950 transition hover:bg-slate-200"
                 >
                   Kandidatuoti dabar
                 </Link>
-              </div>
-            </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 sm:p-7">
-              <div className="flex items-start gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-800">
-                  <BriefcaseBusiness
-                    className="h-6 w-6 text-white"
-                    strokeWidth={1.8}
-                  />
-                </div>
-
-                <div>
-                  <h2 className="text-lg font-bold">
-                    Paprastas kandidatavimas
-                  </h2>
-
-                  <p className="mt-2 leading-7 text-slate-400">
-                    Pasirinkite darbo pasiūlymą ir užpildykite
-                    trumpą kandidatūros anketą.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-7 border-t border-slate-800 pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-800">
-                    <Building2
-                      className="h-6 w-6 text-white"
-                      strokeWidth={1.8}
-                    />
-                  </div>
-
-                  <div>
-                    <h2 className="text-lg font-bold">
-                      Darbdaviai Norvegijoje
-                    </h2>
-
-                    <p className="mt-2 leading-7 text-slate-400">
-                      Kandidatūros gali būti perduodamos
-                      potencialiems darbdaviams pagal jūsų
-                      kvalifikaciją ir pasirinktą poziciją.
-                    </p>
-                  </div>
-                </div>
+                <Link
+                  href="#darbai"
+                  className="flex items-center justify-center rounded-xl border border-slate-600 px-8 py-4 text-center font-bold text-white transition hover:border-slate-400 hover:bg-slate-900"
+                >
+                  Daugiau informacijos
+                </Link>
               </div>
             </div>
           </div>
@@ -267,14 +275,17 @@ export default function Home() {
             </h2>
 
             <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
-              Peržiūrėkite aktyvias pozicijas ir pateikite
-              kandidatūrą tiesiai į pasirinktą darbo pasiūlymą.
+              Peržiūrėkite aktyvias
+              pozicijas ir pateikite
+              kandidatūrą tiesiai į
+              pasirinktą darbo pasiūlymą.
             </p>
           </div>
 
           {loading && (
             <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 sm:mt-10">
-              Kraunami darbo pasiūlymai...
+              Kraunami darbo
+              pasiūlymai...
             </div>
           )}
 
@@ -288,216 +299,263 @@ export default function Home() {
             !errorMessage &&
             darbai.length === 0 && (
               <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 sm:mt-10">
-                Šiuo metu aktyvių darbo pasiūlymų nėra.
+                Šiuo metu aktyvių darbo
+                pasiūlymų nėra.
               </div>
             )}
 
           <div className="mt-8 space-y-6 sm:mt-10 sm:space-y-8">
-            {darbai.map((darbas) => (
-              <article
-                key={darbas.id}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
-              >
-                <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100">
-                        <BriefcaseBusiness
-                          className="h-6 w-6 text-slate-700"
-                          strokeWidth={1.8}
-                        />
+            {darbai.map(
+              (darbas, index) => (
+                <article
+                  key={darbas.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7"
+                >
+                  <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+                    <div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                          <BriefcaseBusiness
+                            className="h-6 w-6 text-slate-700"
+                            strokeWidth={
+                              1.8
+                            }
+                          />
+                        </div>
+
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-600">
+                          Norvegija
+                        </span>
                       </div>
 
-                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-600">
-                        Norvegija
-                      </span>
+                      <h3 className="mt-5 text-2xl font-bold text-slate-900 sm:text-3xl">
+                        {
+                          darbas.pavadinimas
+                        }
+                      </h3>
                     </div>
 
-                    <h3 className="mt-5 text-2xl font-bold text-slate-900 sm:text-3xl">
-                      {darbas.pavadinimas}
-                    </h3>
+                    {darbas.atlyginimas && (
+                      <div>
+                        <div className="inline-flex rounded-xl bg-slate-900 px-5 py-3 text-white">
+                          <div className="flex items-center gap-2">
+                            <Banknote
+                              className="h-5 w-5"
+                              strokeWidth={
+                                1.8
+                              }
+                            />
+
+                            <span className="font-bold">
+                              {
+                                darbas.atlyginimas
+                              }
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+                          Atlyginimas
+                          priklauso nuo
+                          patirties ir
+                          kvalifikacijos.
+                          Nurodytas pradinis
+                          atlygis taikomas
+                          kandidatams be
+                          patirties arba
+                          turintiems mažai
+                          patirties.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
-                  {darbas.atlyginimas && (
-                    <div>
-                      <div className="inline-flex rounded-xl bg-slate-900 px-5 py-3 text-white">
-                        <div className="flex items-center gap-2">
-                          <Banknote
-                            className="h-5 w-5"
-                            strokeWidth={1.8}
-                          />
+                  <div className="mt-6 flex items-center gap-3 border-b border-slate-200 pb-6 text-slate-700">
+                    <MapPin
+                      className="h-5 w-5 shrink-0 text-slate-500"
+                      strokeWidth={1.8}
+                    />
 
-                          <span className="font-bold">
-                            {darbas.atlyginimas}
-                          </span>
-                        </div>
+                    <span className="font-semibold">
+                      {darbas.miestas},
+                      Norvegija
+                    </span>
+                  </div>
+
+                  <div className="mt-6 sm:hidden">
+                    <Link
+                      href={`/registracija?darbas=${darbas.id}`}
+                      className="flex w-full items-center justify-center rounded-xl bg-slate-900 px-6 py-4 text-lg font-bold text-white transition hover:bg-slate-700"
+                    >
+                      Kandidatuoti dabar
+                    </Link>
+                  </div>
+
+                  {index !== 0 &&
+                    darbas.video_url && (
+                      <div className="mt-6 overflow-hidden rounded-2xl bg-black shadow-sm">
+                        <video
+                          src={
+                            darbas.video_url
+                          }
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          controls
+                          preload="metadata"
+                          className="aspect-video w-full object-cover"
+                        />
                       </div>
+                    )}
 
-                      <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
-                        Atlyginimas priklauso nuo patirties ir
-                        kvalifikacijos. Nurodytas pradinis atlygis
-                        taikomas kandidatams be patirties arba
-                        turintiems mažai patirties.
+                  <div className="mt-7 grid gap-x-10 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
+                    <InfoRow
+                      icon={
+                        <Clock3
+                          className="h-5 w-5"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      }
+                      label="Darbo grafikas"
+                      value={
+                        darbas.grafikas
+                      }
+                    />
+
+                    <InfoRow
+                      icon={
+                        <CalendarDays
+                          className="h-5 w-5"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      }
+                      label="Rotacija"
+                      value={
+                        darbas.rotacija
+                      }
+                    />
+
+                    <InfoRow
+                      icon={
+                        <House
+                          className="h-5 w-5"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      }
+                      label="Apgyvendinimas"
+                      value={
+                        darbas.apgyvendinimas
+                      }
+                    />
+
+                    <InfoRow
+                      icon={
+                        <Plane
+                          className="h-5 w-5"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      }
+                      label="Kelionė"
+                      value={
+                        darbas.kelione
+                      }
+                    />
+
+                    <InfoRow
+                      icon={
+                        <UserRoundCheck
+                          className="h-5 w-5"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      }
+                      label="Reikalaujama patirtis"
+                      value={
+                        darbas.patirtis_reikalavimas
+                      }
+                    />
+
+                    <InfoRow
+                      icon={
+                        <Languages
+                          className="h-5 w-5"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      }
+                      label="Kalbos"
+                      value={
+                        darbas.kalba_reikalavimas
+                      }
+                    />
+
+                    <InfoRow
+                      icon={
+                        <Car
+                          className="h-5 w-5"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      }
+                      label="Vairuotojo pažymėjimas"
+                      value={
+                        darbas.vairuotojo_pazymejimas
+                      }
+                    />
+
+                    <InfoRow
+                      icon={
+                        <CalendarDays
+                          className="h-5 w-5"
+                          strokeWidth={
+                            1.8
+                          }
+                        />
+                      }
+                      label="Darbo pradžia"
+                      value={
+                        darbas.darbo_pradzia
+                      }
+                    />
+                  </div>
+
+                  {darbas.aprasymas && (
+                    <div className="mt-8 border-t border-slate-200 pt-7">
+                      <h4 className="text-lg font-bold text-slate-900">
+                        Darbo aprašymas
+                      </h4>
+
+                      <p className="mt-3 whitespace-pre-wrap leading-8 text-slate-600">
+                        {
+                          darbas.aprasymas
+                        }
                       </p>
                     </div>
                   )}
-                </div>
 
-                <div className="mt-6 flex items-center gap-3 border-b border-slate-200 pb-6 text-slate-700">
-                  <MapPin
-                    className="h-5 w-5 shrink-0 text-slate-500"
-                    strokeWidth={1.8}
-                  />
-
-                  <span className="font-semibold">
-                    {darbas.miestas}, Norvegija
-                  </span>
-                </div>
-
-                <div className="mt-6 sm:hidden">
-                  <Link
-                    href={`/registracija?darbas=${darbas.id}`}
-                    className="flex w-full items-center justify-center rounded-xl bg-slate-900 px-6 py-4 text-lg font-bold text-white transition hover:bg-slate-700"
-                  >
-                    Kandidatuoti dabar
-                  </Link>
-
-                  <p className="mt-2 text-center text-sm text-slate-500">
-                    Anketos užpildymas trunka apie 1 minutę.
-                  </p>
-                </div>
-
-                {darbas.video_url && (
-                  <div className="mt-6 overflow-hidden rounded-2xl bg-black shadow-sm">
-                    <video
-                      src={darbas.video_url}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      controls
-                      preload="metadata"
-                      className="aspect-video w-full object-cover"
-                    />
+                  <div className="mt-8 hidden sm:block">
+                    <Link
+                      href={`/registracija?darbas=${darbas.id}`}
+                      className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-7 py-4 font-bold text-white transition hover:bg-slate-700"
+                    >
+                      Kandidatuoti dabar
+                    </Link>
                   </div>
-                )}
-
-                <div className="mt-7 grid gap-x-10 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-                  <InfoRow
-                    icon={
-                      <Clock3
-                        className="h-5 w-5"
-                        strokeWidth={1.8}
-                      />
-                    }
-                    label="Darbo grafikas"
-                    value={darbas.grafikas}
-                  />
-
-                  <InfoRow
-                    icon={
-                      <CalendarDays
-                        className="h-5 w-5"
-                        strokeWidth={1.8}
-                      />
-                    }
-                    label="Rotacija"
-                    value={darbas.rotacija}
-                  />
-
-                  <InfoRow
-                    icon={
-                      <House
-                        className="h-5 w-5"
-                        strokeWidth={1.8}
-                      />
-                    }
-                    label="Apgyvendinimas"
-                    value={darbas.apgyvendinimas}
-                  />
-
-                  <InfoRow
-                    icon={
-                      <Plane
-                        className="h-5 w-5"
-                        strokeWidth={1.8}
-                      />
-                    }
-                    label="Kelionė"
-                    value={darbas.kelione}
-                  />
-
-                  <InfoRow
-                    icon={
-                      <UserRoundCheck
-                        className="h-5 w-5"
-                        strokeWidth={1.8}
-                      />
-                    }
-                    label="Reikalaujama patirtis"
-                    value={darbas.patirtis_reikalavimas}
-                  />
-
-                  <InfoRow
-                    icon={
-                      <Languages
-                        className="h-5 w-5"
-                        strokeWidth={1.8}
-                      />
-                    }
-                    label="Kalbos"
-                    value={darbas.kalba_reikalavimas}
-                  />
-
-                  <InfoRow
-                    icon={
-                      <Car
-                        className="h-5 w-5"
-                        strokeWidth={1.8}
-                      />
-                    }
-                    label="Vairuotojo pažymėjimas"
-                    value={darbas.vairuotojo_pazymejimas}
-                  />
-
-                  <InfoRow
-                    icon={
-                      <CalendarDays
-                        className="h-5 w-5"
-                        strokeWidth={1.8}
-                      />
-                    }
-                    label="Darbo pradžia"
-                    value={darbas.darbo_pradzia}
-                  />
-                </div>
-
-                {darbas.aprasymas && (
-                  <div className="mt-8 border-t border-slate-200 pt-7">
-                    <h4 className="text-lg font-bold text-slate-900">
-                      Darbo aprašymas
-                    </h4>
-
-                    <p className="mt-3 whitespace-pre-wrap leading-8 text-slate-600">
-                      {darbas.aprasymas}
-                    </p>
-                  </div>
-                )}
-
-                <div className="mt-8 hidden sm:block">
-                  <Link
-                    href={`/registracija?darbas=${darbas.id}`}
-                    className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-7 py-4 font-bold text-white transition hover:bg-slate-700"
-                  >
-                    Kandidatuoti dabar
-                  </Link>
-
-                  <p className="mt-2 text-sm text-slate-500">
-                    Anketos užpildymas trunka apie 1 minutę.
-                  </p>
-                </div>
-              </article>
-            ))}
+                </article>
+              )
+            )}
           </div>
         </section>
 
@@ -510,13 +568,16 @@ export default function Home() {
               />
 
               <h3 className="mt-4 text-lg font-bold text-slate-900">
-                Įvairios statybų pozicijos
+                Įvairios statybų
+                pozicijos
               </h3>
 
               <p className="mt-2 leading-7 text-slate-600">
-                Staliai, betonuotojai, apdailininkai,
-                santechnikai, elektrikai ir kitų sričių
-                darbuotojai.
+                Staliai, betonuotojai,
+                apdailininkai,
+                santechnikai,
+                elektrikai ir kitų
+                sričių darbuotojai.
               </p>
             </div>
 
@@ -531,7 +592,8 @@ export default function Home() {
               </h3>
 
               <p className="mt-2 leading-7 text-slate-600">
-                Kandidatūros pateikimas platformoje yra
+                Kandidatūros pateikimas
+                platformoje yra
                 nemokamas.
               </p>
             </div>
@@ -547,8 +609,10 @@ export default function Home() {
               </h3>
 
               <p className="mt-2 leading-7 text-slate-600">
-                Pagrindinei anketai užtenka kelių laukų.
-                CV galima pridėti neprivalomai.
+                Pagrindinei anketai
+                užtenka kelių laukų.
+                CV galima pridėti
+                neprivalomai.
               </p>
             </div>
           </div>
