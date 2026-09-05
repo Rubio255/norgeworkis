@@ -5,8 +5,7 @@ import {
 import { createClient } from "@supabase/supabase-js";
 import { createHmac } from "crypto";
 
-export const runtime =
-  "nodejs";
+export const runtime = "nodejs";
 
 const MAX_CV_SIZE =
   10 * 1024 * 1024;
@@ -57,27 +56,17 @@ function validateName(
   const namePattern =
     /^[\p{L}][\p{L}'’ -]*[\p{L}]$/u;
 
-  if (
-    !namePattern.test(value)
-  ) {
+  if (!namePattern.test(value)) {
     return `${fieldName} gali būti sudarytas tik iš raidžių, tarpų, brūkšnelio arba apostrofo.`;
   }
 
-  const lettersOnly =
-    value
-      .toLocaleLowerCase(
-        "lt-LT"
-      )
-      .replace(
-        /[^\p{L}]/gu,
-        ""
-      );
+  const lettersOnly = value
+    .toLocaleLowerCase("lt-LT")
+    .replace(/[^\p{L}]/gu, "");
 
   if (
     lettersOnly.length >= 3 &&
-    new Set(
-      lettersOnly
-    ).size === 1
+    new Set(lettersOnly).size === 1
   ) {
     return `Įveskite tikrą ${fieldName.toLowerCase()}.`;
   }
@@ -122,9 +111,7 @@ function validatePhone(
   const phonePattern =
     /^\+[1-9]\d{7,14}$/;
 
-  if (
-    !phonePattern.test(phone)
-  ) {
+  if (!phonePattern.test(phone)) {
     return "Telefono numerį įveskite tarptautiniu formatu, pvz. +37061234567 arba +4791234567.";
   }
 
@@ -135,7 +122,7 @@ function validateEmail(
   value: string
 ) {
   if (!value) {
-    return null;
+    return "Įveskite el. pašto adresą.";
   }
 
   if (
@@ -168,9 +155,7 @@ function validateEmail(
   const emailPattern =
     /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
-  if (
-    !emailPattern.test(value)
-  ) {
+  if (!emailPattern.test(value)) {
     return "Neteisingas el. pašto adresas.";
   }
 
@@ -373,9 +358,7 @@ export async function POST(
 
     const website =
       cleanText(
-        formData.get(
-          "website"
-        ),
+        formData.get("website"),
         200
       );
 
@@ -415,9 +398,7 @@ export async function POST(
         turnstileSecret
       );
 
-    if (
-      !turnstile.success
-    ) {
+    if (!turnstile.success) {
       return NextResponse.json(
         {
           error:
@@ -455,11 +436,8 @@ export async function POST(
         serviceRoleKey,
         {
           auth: {
-            persistSession:
-              false,
-
-            autoRefreshToken:
-              false,
+            persistSession: false,
+            autoRefreshToken: false,
           },
         }
       );
@@ -479,12 +457,9 @@ export async function POST(
     } = await supabase.rpc(
       "check_registration_rate_limit",
       {
-        p_ip_hash:
-          ipHash,
-
+        p_ip_hash: ipHash,
         p_window_start:
           windowStart,
-
         p_max_requests:
           RATE_LIMIT_MAX_REQUESTS,
       }
@@ -532,17 +507,13 @@ export async function POST(
 
     const vardas =
       cleanText(
-        formData.get(
-          "vardas"
-        ),
+        formData.get("vardas"),
         80
       );
 
     const pavarde =
       cleanText(
-        formData.get(
-          "pavarde"
-        ),
+        formData.get("pavarde"),
         100
       );
 
@@ -561,9 +532,7 @@ export async function POST(
 
     const email =
       cleanText(
-        formData.get(
-          "email"
-        ),
+        formData.get("email"),
         180
       ).toLowerCase();
 
@@ -577,9 +546,7 @@ export async function POST(
 
     const patirtis =
       cleanText(
-        formData.get(
-          "patirtis"
-        ),
+        formData.get("patirtis"),
         100
       );
 
@@ -601,9 +568,7 @@ export async function POST(
 
     const apie =
       cleanText(
-        formData.get(
-          "apie"
-        ),
+        formData.get("apie"),
         3000
       );
 
@@ -624,8 +589,7 @@ export async function POST(
     if (vardasError) {
       return NextResponse.json(
         {
-          error:
-            vardasError,
+          error: vardasError,
         },
         {
           status: 400,
@@ -742,14 +706,8 @@ export async function POST(
       } = await supabase
         .from("darbai")
         .select("id")
-        .eq(
-          "id",
-          parsedId
-        )
-        .eq(
-          "aktyvus",
-          true
-        )
+        .eq("id", parsedId)
+        .eq("aktyvus", true)
         .maybeSingle();
 
       if (darbasError) {
@@ -781,8 +739,7 @@ export async function POST(
         );
       }
 
-      darbasId =
-        parsedId;
+      darbasId = parsedId;
     }
 
     const cvEntry =
@@ -882,8 +839,7 @@ export async function POST(
             cacheControl:
               "3600",
 
-            upsert:
-              false,
+            upsert: false,
           }
         );
 
@@ -920,19 +876,17 @@ export async function POST(
 
         telefonas,
 
-        email:
-          email || "",
+        email,
 
         profesija,
+
         patirtis,
 
         norvegu_kalba:
-          norveguKalba ||
-          "",
+          norveguKalba || "",
 
         anglu_kalba:
-          angluKalba ||
-          "",
+          angluKalba || "",
 
         apie:
           apie || null,
