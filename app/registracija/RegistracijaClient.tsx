@@ -134,8 +134,9 @@ function validateEmail(
   const email =
     value.trim().toLowerCase();
 
+  // EL. PAŠTAS PRIVALOMAS
   if (!email) {
-    return null;
+    return "Įveskite el. pašto adresą.";
   }
 
   if (
@@ -160,7 +161,9 @@ function validateEmail(
     !localPart ||
     !domain ||
     localPart.startsWith(".") ||
-    localPart.endsWith(".")
+    localPart.endsWith(".") ||
+    domain.startsWith(".") ||
+    domain.endsWith(".")
   ) {
     return "Neteisingas el. pašto adresas.";
   }
@@ -207,10 +210,8 @@ export default function RegistracijaClient() {
   const [vardas, setVardas] =
     useState("");
 
-  const [
-    pavarde,
-    setPavarde,
-  ] = useState("");
+  const [pavarde, setPavarde] =
+    useState("");
 
   const [
     telefonas,
@@ -365,6 +366,7 @@ export default function RegistracijaClient() {
             setTurnstileToken(
               token
             );
+
             setErrorMessage("");
           },
 
@@ -395,8 +397,7 @@ export default function RegistracijaClient() {
 
     return () => {
       if (
-        window.turnstile
-          ?.remove &&
+        window.turnstile?.remove &&
         turnstileWidgetIdRef.current
       ) {
         window.turnstile.remove(
@@ -443,12 +444,11 @@ export default function RegistracijaClient() {
         .pop()
         ?.toLowerCase();
 
-    const allowedExtensions =
-      [
-        "pdf",
-        "doc",
-        "docx",
-      ];
+    const allowedExtensions = [
+      "pdf",
+      "doc",
+      "docx",
+    ];
 
     if (
       !extension ||
@@ -532,6 +532,14 @@ export default function RegistracijaClient() {
     if (telefonasError) {
       setErrorMessage(
         telefonasError
+      );
+      return;
+    }
+
+    // EL. PAŠTAS PRIVALOMAS
+    if (!email.trim()) {
+      setErrorMessage(
+        "Įveskite el. pašto adresą."
       );
       return;
     }
@@ -837,34 +845,28 @@ export default function RegistracijaClient() {
               </p>
 
               <h1 className="mt-2 text-2xl font-bold text-slate-950 sm:text-3xl">
-                Kandidatuokite į darbą
-                Norvegijoje
+                Kandidatuokite į darbą Norvegijoje
               </h1>
 
               <div className="mt-4 rounded-xl bg-sky-50 p-4">
                 <p className="font-bold text-slate-900">
-                  Užpildymas trunka apie
-                  1 minutę.
+                  Užpildymas trunka apie 1 minutę.
                 </p>
 
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  Įveskite pagrindinę
-                  informaciją. CV ir
-                  papildoma informacija
-                  nėra privalomi.
+                  Įveskite pagrindinę informaciją.
+                  CV ir papildoma informacija nėra privalomi.
                 </p>
 
                 <p className="mt-2 font-bold text-sky-700">
-                  Su jumis nedelsdami
-                  susisieksime.
+                  Su jumis nedelsdami susisieksime.
                 </p>
               </div>
             </div>
 
             {darbasLoading && (
               <div className="mt-6 rounded-xl bg-slate-100 p-5 text-slate-600">
-                Kraunamas darbo
-                pasiūlymas...
+                Kraunamas darbo pasiūlymas...
               </div>
             )}
 
@@ -876,21 +878,16 @@ export default function RegistracijaClient() {
                   </p>
 
                   <h2 className="mt-2 text-xl font-bold text-slate-900">
-                    {
-                      darbas.pavadinimas
-                    }
+                    {darbas.pavadinimas}
                   </h2>
 
                   <p className="mt-1 text-slate-600">
-                    {darbas.miestas},
-                    Norvegija
+                    {darbas.miestas}, Norvegija
                   </p>
 
                   {darbas.atlyginimas && (
                     <p className="mt-2 font-semibold text-slate-900">
-                      {
-                        darbas.atlyginimas
-                      }
+                      {darbas.atlyginimas}
                     </p>
                   )}
                 </div>
@@ -909,9 +906,7 @@ export default function RegistracijaClient() {
             )}
 
             <form
-              onSubmit={
-                handleSubmit
-              }
+              onSubmit={handleSubmit}
               className="mt-7 space-y-6"
             >
               <div
@@ -962,9 +957,7 @@ export default function RegistracijaClient() {
                   />
 
                   <p className="mt-1.5 text-xs text-slate-500">
-                    Tik vardas, be
-                    skaičių ar kitų
-                    simbolių.
+                    Tik vardas, be skaičių ar kitų simbolių.
                   </p>
                 </div>
 
@@ -989,11 +982,36 @@ export default function RegistracijaClient() {
                   />
 
                   <p className="mt-1.5 text-xs text-slate-500">
-                    Tarptautinis formatas,
-                    pvz. +37061234567
-                    arba +4791234567.
+                    Tarptautinis formatas, pvz. +37061234567 arba +4791234567.
                   </p>
                 </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block font-semibold text-slate-700">
+                  El. paštas *
+                </label>
+
+                <input
+                  type="email"
+                  required
+                  minLength={5}
+                  maxLength={180}
+                  value={email}
+                  onChange={(e) =>
+                    setEmail(
+                      e.target.value
+                    )
+                  }
+                  autoComplete="email"
+                  inputMode="email"
+                  placeholder="pvz. jonas@gmail.com"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                />
+
+                <p className="mt-1.5 text-xs text-slate-500">
+                  El. paštas privalomas.
+                </p>
               </div>
 
               <div>
@@ -1012,8 +1030,7 @@ export default function RegistracijaClient() {
                   className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
                 >
                   <option value="">
-                    Pasirinkite
-                    profesiją
+                    Pasirinkite profesiją
                   </option>
 
                   <option value="Stalius">
@@ -1090,76 +1107,42 @@ export default function RegistracijaClient() {
                   </option>
 
                   <option value="Daugiau nei 5 metai">
-                    Daugiau nei 5
-                    metai
+                    Daugiau nei 5 metai
                   </option>
                 </select>
               </div>
 
               <div className="border-t border-slate-200 pt-6">
                 <p className="mb-5 text-sm font-bold uppercase tracking-wider text-slate-500">
-                  Papildoma informacija
-                  – neprivaloma
+                  Papildoma informacija – neprivaloma
                 </p>
 
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block font-semibold text-slate-700">
-                      Pavardė{" "}
-                      <span className="font-normal text-slate-400">
-                        (neprivaloma)
-                      </span>
-                    </label>
+                <div>
+                  <label className="mb-2 block font-semibold text-slate-700">
+                    Pavardė
+                  </label>
 
-                    <input
-                      type="text"
-                      minLength={2}
-                      maxLength={50}
-                      value={pavarde}
-                      onChange={(e) =>
-                        setPavarde(
-                          e.target.value
-                        )
-                      }
-                      autoComplete="family-name"
-                      placeholder="Pvz. Jonaitis"
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block font-semibold text-slate-700">
-                      El. paštas{" "}
-                      <span className="font-normal text-slate-400">
-                        (neprivaloma)
-                      </span>
-                    </label>
-
-                    <input
-                      type="email"
-                      maxLength={180}
-                      value={email}
-                      onChange={(e) =>
-                        setEmail(
-                          e.target.value
-                        )
-                      }
-                      autoComplete="email"
-                      inputMode="email"
-                      placeholder="pvz. jonas@gmail.com"
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    minLength={2}
+                    maxLength={50}
+                    value={pavarde}
+                    onChange={(e) =>
+                      setPavarde(
+                        e.target.value
+                      )
+                    }
+                    autoComplete="family-name"
+                    placeholder="Pvz. Jonaitis"
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                  />
                 </div>
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block font-semibold text-slate-700">
-                    Norvegų kalba{" "}
-                    <span className="font-normal text-slate-400">
-                      (neprivaloma)
-                    </span>
+                    Norvegų kalba
                   </label>
 
                   <select
@@ -1196,10 +1179,7 @@ export default function RegistracijaClient() {
 
                 <div>
                   <label className="mb-2 block font-semibold text-slate-700">
-                    Anglų kalba{" "}
-                    <span className="font-normal text-slate-400">
-                      (neprivaloma)
-                    </span>
+                    Anglų kalba
                   </label>
 
                   <select
@@ -1237,10 +1217,7 @@ export default function RegistracijaClient() {
 
               <div>
                 <label className="mb-2 block font-semibold text-slate-700">
-                  Trumpai apie save{" "}
-                  <span className="font-normal text-slate-400">
-                    (neprivaloma)
-                  </span>
+                  Trumpai apie save
                 </label>
 
                 <textarea
@@ -1261,10 +1238,7 @@ export default function RegistracijaClient() {
                   htmlFor="cv"
                   className="mb-2 block font-semibold text-slate-700"
                 >
-                  CV{" "}
-                  <span className="font-normal text-slate-400">
-                    (neprivaloma)
-                  </span>
+                  CV (neprivaloma)
                 </label>
 
                 <input
@@ -1282,9 +1256,7 @@ export default function RegistracijaClient() {
                 />
 
                 <p className="mt-2 text-sm text-slate-500">
-                  PDF, DOC arba DOCX.
-                  Maksimalus dydis –
-                  10 MB.
+                  PDF, DOC arba DOCX. Maksimalus dydis – 10 MB.
                 </p>
 
                 {cv && (
@@ -1305,23 +1277,20 @@ export default function RegistracijaClient() {
                     }
                     onChange={(e) =>
                       setSutinkuPrivatumas(
-                        e.target
-                          .checked
+                        e.target.checked
                       )
                     }
                     className="mt-1 h-5 w-5 shrink-0"
                   />
 
                   <span className="text-sm leading-6 text-slate-600">
-                    Patvirtinu, kad
-                    susipažinau su{" "}
+                    Patvirtinu, kad susipažinau su{" "}
                     <Link
                       href="/privatumo-politika"
                       target="_blank"
                       className="font-semibold text-sky-700 underline"
                     >
-                      privatumo
-                      politika
+                      privatumo politika
                     </Link>
                     .
                   </span>
@@ -1336,42 +1305,30 @@ export default function RegistracijaClient() {
                     }
                     onChange={(e) =>
                       setSutinkuPerdavimas(
-                        e.target
-                          .checked
+                        e.target.checked
                       )
                     }
                     className="mt-1 h-5 w-5 shrink-0"
                   />
 
                   <span className="text-sm leading-6 text-slate-600">
-                    Sutinku, kad mano
-                    pateikti kandidatūros
-                    duomenys ir, jei
-                    pateiktas, CV būtų
-                    naudojami kandidatūros
-                    administravimui ir
-                    galėtų būti perduoti
-                    potencialiems
-                    darbdaviams dėl mano
-                    pasirinktos arba mano
-                    kvalifikaciją
-                    atitinkančios darbo
-                    pozicijos.
+                    Sutinku, kad mano pateikti kandidatūros duomenys ir,
+                    jei pateiktas, CV būtų naudojami kandidatūros
+                    administravimui ir galėtų būti perduoti potencialiems
+                    darbdaviams dėl mano pasirinktos arba mano kvalifikaciją
+                    atitinkančios darbo pozicijos.
                   </span>
                 </label>
               </div>
 
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <p className="mb-3 text-sm text-slate-600">
-                  Apsaugos nuo
-                  automatinių užklausų
-                  patikrinimas
+                  Apsaugos nuo automatinių užklausų patikrinimas
                 </p>
 
                 {!siteKey ? (
                   <p className="text-sm font-semibold text-red-600">
-                    Trūksta Turnstile
-                    Site Key.
+                    Trūksta Turnstile Site Key.
                   </p>
                 ) : (
                   <div
@@ -1396,9 +1353,7 @@ export default function RegistracijaClient() {
               </button>
 
               <p className="text-center text-sm text-slate-500">
-                Kandidatūros
-                pateikimas kandidatui
-                yra nemokamas.
+                Kandidatūros pateikimas kandidatui yra nemokamas.
               </p>
             </form>
           </div>
