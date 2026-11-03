@@ -1,0 +1,19 @@
+﻿<svg width="520" height="120" viewBox="0 0 520 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="520" height="120" rx="16" fill="white"/>
+
+  <g transform="translate(18,18)">
+    <path d="M0 0H32L72 34V0H90V84H72L31 49V84H0V0Z" fill="#102A56"/>
+    <path d="M58 10L90 -8V13L58 31V10Z" fill="#D92D2D"/>
+  </g>
+
+  <text
+    x="130"
+    y="73"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="46"
+    font-weight="700"
+    fill="#102A56"
+  >
+    Norgeworkis
+  </text>
+</svg>
