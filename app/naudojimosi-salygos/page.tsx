@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LegalFooter from "../components/LegalFooter";
+import NorgeworkisLogo from "../components/NorgeworkisLogo";
 
 export const metadata = {
   title: "Naudojimosi sąlygos | Norgeworkis",
@@ -12,12 +13,7 @@ export default function NaudojimosiSalygosPage() {
     <>
       <main className="min-h-screen bg-slate-100 px-6 py-12">
         <article className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-12">
-          <Link
-            href="/"
-            className="inline-block text-2xl font-black tracking-[0.08em] text-slate-900 transition hover:text-slate-600"
-          >
-            NORGEWORKIS
-          </Link>
+          <NorgeworkisLogo />
 
           <div className="mt-8 border-b border-slate-200 pb-8">
             <h1 className="text-4xl font-bold text-slate-900">
@@ -46,8 +42,9 @@ export default function NaudojimosiSalygosPage() {
               </p>
 
               <p className="mt-3">
-                Naudodamiesi svetaine ir pateikdami kandidatūrą patvirtinate,
-                kad susipažinote su šiomis naudojimosi sąlygomis.
+                Naudodamiesi svetaine ir pateikdami kandidatūrą
+                patvirtinate, kad susipažinote su šiomis naudojimosi
+                sąlygomis.
               </p>
             </section>
 
@@ -57,9 +54,9 @@ export default function NaudojimosiSalygosPage() {
               </h2>
 
               <p className="mt-4">
-                Platformoje gali būti skelbiami darbo pasiūlymai Norvegijoje
-                ir kitose rinkose, o kandidatai gali pateikti savo
-                kandidatūrą į pasirinktą poziciją.
+                Platformoje gali būti skelbiami darbo pasiūlymai
+                Norvegijoje ir kitose rinkose, o kandidatai gali pateikti
+                savo kandidatūrą į pasirinktą poziciją.
               </p>
 
               <p className="mt-3">
@@ -75,11 +72,6 @@ export default function NaudojimosiSalygosPage() {
               </h2>
 
               <p className="mt-4">
-                Kandidatams kandidatūros pateikimas per „Norgeworkis“
-                platformą yra nemokamas.
-              </p>
-
-              <p className="mt-3">
                 Kandidatūros pateikimas negarantuoja darbo pasiūlymo,
                 darbo pokalbio, atrankos tęstinumo ar darbo sutarties
                 sudarymo.
@@ -192,15 +184,10 @@ export default function NaudojimosiSalygosPage() {
 
             <section>
               <h2 className="text-2xl font-bold text-slate-900">
-                8. Atsiskaitymai
+                8. Komerciniai santykiai
               </h2>
 
               <p className="mt-4">
-                Kandidatams kandidatūros pateikimas per platformą yra
-                nemokamas.
-              </p>
-
-              <p className="mt-3">
                 Platformos administratorius gali sudaryti komercinius
                 susitarimus su darbdaviais ar partneriais dėl kandidatų
                 paieškos, atrankos, konsultavimo, darbo pasiūlymų skelbimo

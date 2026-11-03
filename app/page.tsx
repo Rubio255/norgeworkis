@@ -19,6 +19,7 @@ import {
 
 import { createClient } from "../utils/supabase/client";
 import LegalFooter from "./components/LegalFooter";
+import NorgeworkisLogo from "./components/NorgeworkisLogo";
 
 type Darbas = {
   id: number;
@@ -39,18 +40,6 @@ type Darbas = {
 
   video_url: string | null;
 };
-
-function NorgeworkisLogo() {
-  return (
-    <div className="flex items-center">
-      <img
-        src="/norgeworkis-logo.svg"
-        alt="Norgeworkis"
-        className="h-10 w-auto sm:h-12"
-      />
-    </div>
-  );
-}
 
 function DetailCard({
   icon,
@@ -75,43 +64,37 @@ function DetailCard({
 
   const styles = {
     blue: {
-      wrapper:
-        "border-blue-200 bg-blue-50",
+      wrapper: "border-blue-200 bg-blue-50",
       icon: "text-blue-600",
       label: "text-blue-700",
     },
 
     violet: {
-      wrapper:
-        "border-violet-200 bg-violet-50",
+      wrapper: "border-violet-200 bg-violet-50",
       icon: "text-violet-600",
       label: "text-violet-700",
     },
 
     green: {
-      wrapper:
-        "border-emerald-200 bg-emerald-50",
+      wrapper: "border-emerald-200 bg-emerald-50",
       icon: "text-emerald-600",
       label: "text-emerald-700",
     },
 
     orange: {
-      wrapper:
-        "border-orange-200 bg-orange-50",
+      wrapper: "border-orange-200 bg-orange-50",
       icon: "text-orange-600",
       label: "text-orange-700",
     },
 
     slate: {
-      wrapper:
-        "border-slate-200 bg-slate-50",
+      wrapper: "border-slate-200 bg-slate-50",
       icon: "text-slate-600",
       label: "text-slate-600",
     },
 
     cyan: {
-      wrapper:
-        "border-cyan-200 bg-cyan-50",
+      wrapper: "border-cyan-200 bg-cyan-50",
       icon: "text-cyan-600",
       label: "text-cyan-700",
     },
@@ -201,12 +184,7 @@ export default function Home() {
       <main className="min-h-screen bg-slate-100">
         <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-            <Link
-              href="/"
-              className="flex items-center"
-            >
-              <NorgeworkisLogo />
-            </Link>
+            <NorgeworkisLogo />
 
             <nav className="hidden items-center gap-8 md:flex">
               <Link
@@ -411,9 +389,7 @@ export default function Home() {
                       darbas.video_url && (
                         <div className="mt-6 overflow-hidden rounded-2xl bg-black shadow-sm">
                           <video
-                            src={
-                              darbas.video_url
-                            }
+                            src={darbas.video_url}
                             autoPlay
                             muted
                             loop

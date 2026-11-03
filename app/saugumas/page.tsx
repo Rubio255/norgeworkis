@@ -1,5 +1,5 @@
-import Link from "next/link";
 import LegalFooter from "../components/LegalFooter";
+import NorgeworkisLogo from "../components/NorgeworkisLogo";
 
 export const metadata = {
   title: "Duomenų saugumas | Norgeworkis",
@@ -10,12 +10,7 @@ export default function SaugumasPage() {
     <>
       <main className="min-h-screen bg-slate-100 px-6 py-12">
         <article className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-12">
-          <Link
-            href="/"
-            className="inline-block text-2xl font-black tracking-[0.08em] text-slate-900 transition hover:text-slate-600"
-          >
-            NORGEWORKIS
-          </Link>
+          <NorgeworkisLogo />
 
           <div className="mt-8 border-b border-slate-200 pb-8">
             <h1 className="text-4xl font-bold text-slate-900">
@@ -156,8 +151,11 @@ export default function SaugumasPage() {
               <p className="mt-3">
                 <strong>Įmonių veiklos analizė, MB</strong>
               </p>
+
               <p>Įmonės kodas: 307404233</p>
+
               <p>El. paštas: info@optinvest.lt</p>
+
               <p>Telefonas: +370 649 94125</p>
             </section>
           </div>

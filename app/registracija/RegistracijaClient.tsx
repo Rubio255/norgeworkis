@@ -9,7 +9,9 @@ import {
   useState,
 } from "react";
 import { useSearchParams } from "next/navigation";
+
 import { createClient } from "../../utils/supabase/client";
+import SiteHeader from "../components/SiteHeader";
 
 type Darbas = {
   id: number;
@@ -817,23 +819,7 @@ export default function RegistracijaClient() {
       />
 
       <main className="min-h-screen bg-slate-100">
-        <header className="border-b border-slate-200 bg-white px-4 py-4 sm:px-6 sm:py-5">
-          <div className="mx-auto flex max-w-4xl items-center justify-between">
-            <Link
-              href="/"
-              className="text-xl font-black tracking-wide text-slate-950"
-            >
-              NORGEWORKIS
-            </Link>
-
-            <Link
-              href="/"
-              className="text-sm font-semibold text-slate-600 hover:text-slate-950"
-            >
-              Darbo pasiūlymai
-            </Link>
-          </div>
-        </header>
+        <SiteHeader />
 
         <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-12">
           <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-8 md:p-10">
@@ -1141,18 +1127,23 @@ export default function RegistracijaClient() {
                     <option value="">
                       Nenurodyta
                     </option>
+
                     <option value="Nekalbu">
                       Nekalbu
                     </option>
+
                     <option value="Pagrindai">
                       Pagrindai
                     </option>
+
                     <option value="Vidutiniškai">
                       Vidutiniškai
                     </option>
+
                     <option value="Gerai">
                       Gerai
                     </option>
+
                     <option value="Laisvai">
                       Laisvai
                     </option>
@@ -1176,18 +1167,23 @@ export default function RegistracijaClient() {
                     <option value="">
                       Nenurodyta
                     </option>
+
                     <option value="Nekalbu">
                       Nekalbu
                     </option>
+
                     <option value="Pagrindai">
                       Pagrindai
                     </option>
+
                     <option value="Vidutiniškai">
                       Vidutiniškai
                     </option>
+
                     <option value="Gerai">
                       Gerai
                     </option>
+
                     <option value="Laisvai">
                       Laisvai
                     </option>
@@ -1319,16 +1315,12 @@ export default function RegistracijaClient() {
                   loading ||
                   !turnstileToken
                 }
-                className="w-full rounded-xl bg-slate-950 px-6 py-4 text-lg font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-xl bg-blue-600 px-6 py-4 text-lg font-black text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading
                   ? "Siunčiama..."
                   : "Kandidatuoti dabar"}
               </button>
-
-              <p className="text-center text-sm text-slate-500">
-                Kandidatūros pateikimas kandidatui yra nemokamas.
-              </p>
             </form>
           </div>
         </div>
