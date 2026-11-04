@@ -115,7 +115,6 @@ export default function Home() {
   return (
     <>
       <main className="min-h-screen bg-slate-100">
-        {/* HEADER */}
         <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
             <NorgeworkisLogo />
@@ -145,11 +144,9 @@ export default function Home() {
           </div>
         </header>
 
-        {/* HERO */}
         <section className="bg-slate-950 text-white">
           <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-10 lg:py-12">
             <div className="grid items-center gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
-              {/* VIDEO */}
               <div className="order-1">
                 <div className="overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-2xl">
                   <video
@@ -165,7 +162,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* TEKSTAS */}
               <div className="order-2">
                 <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-emerald-300">
                   <BriefcaseBusiness
@@ -209,7 +205,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* DARBO PASIŪLYMAI */}
         <section
           id="darbai"
           className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14"
@@ -259,7 +254,6 @@ export default function Home() {
                 className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="flex flex-1 flex-col p-5">
-                  {/* VIRŠUS */}
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
                       <BriefcaseBusiness
@@ -273,7 +267,6 @@ export default function Home() {
                     </span>
                   </div>
 
-                  {/* PAVADINIMAS */}
                   <h3 className="mt-4 text-xl font-black leading-7 text-slate-950">
                     {darbas.pavadinimas}
                   </h3>
@@ -289,7 +282,6 @@ export default function Home() {
                     </span>
                   </div>
 
-                  {/* ATLYGINIMAS */}
                   {darbas.atlyginimas && (
                     <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
                       <div className="flex items-center gap-2">
@@ -309,7 +301,6 @@ export default function Home() {
                     </div>
                   )}
 
-                  {/* SVARBIAUSIA INFORMACIJA */}
                   <div className="mt-4 grid gap-2">
                     <MiniDetail
                       icon={
@@ -356,7 +347,6 @@ export default function Home() {
                     />
                   </div>
 
-                  {/* TRUMPAS APRAŠYMAS */}
                   {darbas.aprasymas && (
                     <div className="mt-4 border-t border-slate-100 pt-4">
                       <p className="max-h-24 overflow-hidden text-sm leading-6 text-slate-600">
@@ -365,38 +355,64 @@ export default function Home() {
                     </div>
                   )}
 
-                  {/* PAPILDOMI DUOMENYS */}
                   <div className="mt-4 flex flex-wrap gap-2">
                     {darbas.kalba_reikalavimas && (
-                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-cyan-50 px-2.5 py-1.5 text-xs font-bold text-cyan-800">
-                        <Languages className="h-3.5 w-3.5" />
-                        {darbas.kalba_reikalavimas}
+                      <div className="inline-flex items-center gap-2 rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-2 text-sm">
+                        <Languages className="h-4 w-4 shrink-0 text-cyan-700" />
+
+                        <span className="font-bold text-cyan-900">
+                          Kalbos:
+                        </span>
+
+                        <span className="font-semibold text-cyan-800">
+                          {darbas.kalba_reikalavimas}
+                        </span>
                       </div>
                     )}
 
                     {darbas.vairuotojo_pazymejimas && (
-                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-700">
-                        <Car className="h-3.5 w-3.5" />
-                        {darbas.vairuotojo_pazymejimas}
+                      <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-sm">
+                        <Car className="h-4 w-4 shrink-0 text-slate-700" />
+
+                        <span className="font-bold text-slate-900">
+                          Vairuotojo pažymėjimas:
+                        </span>
+
+                        <span className="font-semibold text-slate-700">
+                          {darbas.vairuotojo_pazymejimas}
+                        </span>
                       </div>
                     )}
 
                     {darbas.kelione && (
-                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-orange-50 px-2.5 py-1.5 text-xs font-bold text-orange-800">
-                        <Plane className="h-3.5 w-3.5" />
-                        {darbas.kelione}
+                      <div className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-sm">
+                        <Plane className="h-4 w-4 shrink-0 text-orange-700" />
+
+                        <span className="font-bold text-orange-900">
+                          Kelionė:
+                        </span>
+
+                        <span className="font-semibold text-orange-800">
+                          {darbas.kelione}
+                        </span>
                       </div>
                     )}
 
                     {darbas.darbo_pradzia && (
-                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-800">
-                        <CalendarDays className="h-3.5 w-3.5" />
-                        {darbas.darbo_pradzia}
+                      <div className="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm">
+                        <CalendarDays className="h-4 w-4 shrink-0 text-emerald-700" />
+
+                        <span className="font-bold text-emerald-900">
+                          Darbo pradžia:
+                        </span>
+
+                        <span className="font-semibold text-emerald-800">
+                          {darbas.darbo_pradzia}
+                        </span>
                       </div>
                     )}
                   </div>
 
-                  {/* MYGTUKAS */}
                   <div className="mt-auto pt-5">
                     <Link
                       href={`/registracija?darbas=${darbas.id}`}
@@ -408,56 +424,6 @@ export default function Home() {
                 </div>
               </article>
             ))}
-          </div>
-        </section>
-
-        {/* APATINĖ INFORMACIJA */}
-        <section className="border-y border-slate-200 bg-white px-4 py-10 sm:px-6">
-          <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
-              <BriefcaseBusiness
-                className="h-6 w-6 text-blue-700"
-                strokeWidth={2}
-              />
-
-              <h3 className="mt-3 font-black text-slate-900">
-                Įvairios statybų pozicijos
-              </h3>
-
-              <p className="mt-1 text-sm leading-6 text-slate-600">
-                Pasirinkite darbą pagal savo patirtį ir specializaciją.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-              <UserRoundCheck
-                className="h-6 w-6 text-emerald-700"
-                strokeWidth={2}
-              />
-
-              <h3 className="mt-3 font-black text-slate-900">
-                Greitas kontaktas
-              </h3>
-
-              <p className="mt-1 text-sm leading-6 text-slate-600">
-                Pateikite kandidatūrą ir su jumis susisieksime.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-              <Clock3
-                className="h-6 w-6 text-amber-700"
-                strokeWidth={2}
-              />
-
-              <h3 className="mt-3 font-black text-slate-900">
-                Trumpa registracija
-              </h3>
-
-              <p className="mt-1 text-sm leading-6 text-slate-600">
-                Kandidatūros anketa užpildoma keliais žingsniais.
-              </p>
-            </div>
           </div>
         </section>
       </main>
