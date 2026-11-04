@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import {
   Banknote,
   BriefcaseBusiness,
-  Building2,
   CalendarDays,
   Car,
   Clock3,
@@ -41,114 +40,54 @@ type Darbas = {
   video_url: string | null;
 };
 
-function DetailCard({
+function MiniDetail({
   icon,
   label,
   value,
-  variant,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string | null;
-  variant:
-    | "blue"
-    | "violet"
-    | "green"
-    | "orange"
-    | "slate"
-    | "cyan";
 }) {
   if (!value) {
     return null;
   }
 
-  const styles = {
-    blue: {
-      wrapper: "border-blue-200 bg-blue-50",
-      icon: "text-blue-600",
-      label: "text-blue-700",
-    },
-
-    violet: {
-      wrapper: "border-violet-200 bg-violet-50",
-      icon: "text-violet-600",
-      label: "text-violet-700",
-    },
-
-    green: {
-      wrapper: "border-emerald-200 bg-emerald-50",
-      icon: "text-emerald-600",
-      label: "text-emerald-700",
-    },
-
-    orange: {
-      wrapper: "border-orange-200 bg-orange-50",
-      icon: "text-orange-600",
-      label: "text-orange-700",
-    },
-
-    slate: {
-      wrapper: "border-slate-200 bg-slate-50",
-      icon: "text-slate-600",
-      label: "text-slate-600",
-    },
-
-    cyan: {
-      wrapper: "border-cyan-200 bg-cyan-50",
-      icon: "text-cyan-600",
-      label: "text-cyan-700",
-    },
-  };
-
-  const current = styles[variant];
-
   return (
-    <div
-      className={`rounded-2xl border p-4 ${current.wrapper}`}
-    >
-      <div className={current.icon}>
+    <div className="flex items-start gap-2 rounded-xl bg-slate-50 p-3">
+      <div className="mt-0.5 shrink-0 text-blue-600">
         {icon}
       </div>
 
-      <p
-        className={`mt-3 text-xs font-black uppercase tracking-wider ${current.label}`}
-      >
-        {label}
-      </p>
+      <div className="min-w-0">
+        <p className="text-[11px] font-black uppercase tracking-wide text-slate-500">
+          {label}
+        </p>
 
-      <p className="mt-1 font-bold leading-6 text-slate-900">
-        {value}
-      </p>
+        <p className="mt-0.5 text-sm font-semibold leading-5 text-slate-900">
+          {value}
+        </p>
+      </div>
     </div>
   );
 }
 
 export default function Home() {
-  const [supabase] = useState(() =>
-    createClient()
-  );
+  const [supabase] = useState(() => createClient());
 
-  const [darbai, setDarbai] =
-    useState<Darbas[]>([]);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [
-    errorMessage,
-    setErrorMessage,
-  ] = useState("");
+  const [darbai, setDarbai] = useState<Darbas[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     async function loadJobs() {
-      const { data, error } =
-        await supabase
-          .from("darbai")
-          .select("*")
-          .eq("aktyvus", true)
-          .order("created_at", {
-            ascending: false,
-          });
+      const { data, error } = await supabase
+        .from("darbai")
+        .select("*")
+        .eq("aktyvus", true)
+        .order("created_at", {
+          ascending: false,
+        });
 
       if (error) {
         setErrorMessage(
@@ -159,10 +98,7 @@ export default function Home() {
         return;
       }
 
-      setDarbai(
-        (data || []) as Darbas[]
-      );
-
+      setDarbai((data || []) as Darbas[]);
       setLoading(false);
     }
 
@@ -170,23 +106,21 @@ export default function Home() {
   }, [supabase]);
 
   const pagrindinisDarbas =
-    darbai.length > 0
-      ? darbai[0]
-      : null;
+    darbai.length > 0 ? darbai[0] : null;
 
-  const pagrindineRegistracija =
-    pagrindinisDarbas
-      ? `/registracija?darbas=${pagrindinisDarbas.id}`
-      : "/registracija";
+  const pagrindineRegistracija = pagrindinisDarbas
+    ? `/registracija?darbas=${pagrindinisDarbas.id}`
+    : "/registracija";
 
   return (
     <>
       <main className="min-h-screen bg-slate-100">
+        {/* HEADER */}
         <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
             <NorgeworkisLogo />
 
-            <nav className="hidden items-center gap-8 md:flex">
+            <nav className="hidden items-center gap-7 md:flex">
               <Link
                 href="#darbai"
                 className="text-sm font-bold text-slate-700 transition hover:text-blue-700"
@@ -211,96 +145,101 @@ export default function Home() {
           </div>
         </header>
 
-        <section className="bg-slate-950 px-4 py-8 text-white sm:px-6 sm:py-12 md:py-16">
-          <div className="mx-auto max-w-6xl">
-            <div className="mx-auto max-w-4xl text-center">
-              <div className="mb-4 flex justify-center">
-                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-emerald-300 sm:text-sm">
+        {/* HERO */}
+        <section className="bg-slate-950 text-white">
+          <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-10 lg:py-12">
+            <div className="grid items-center gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
+              {/* VIDEO */}
+              <div className="order-1">
+                <div className="overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-2xl">
+                  <video
+                    src="/videos/statybu-aikstele.mp4"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    disablePictureInPicture
+                    className="pointer-events-none aspect-video w-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* TEKSTAS */}
+              <div className="order-2">
+                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-emerald-300">
                   <BriefcaseBusiness
                     className="h-4 w-4"
                     strokeWidth={2}
                   />
-
                   Darbas Norvegijoje
                 </span>
-              </div>
 
-              <h1 className="text-3xl font-black leading-tight sm:text-4xl md:text-6xl">
-                Statybų darbai Norvegijoje
-              </h1>
+                <h1 className="mt-4 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                  Statybų darbai Norvegijoje
+                </h1>
 
-              <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-slate-300 sm:mt-5 sm:text-lg">
-                Atlyginimas pagal patirtį ir kvalifikaciją.
-              </p>
-            </div>
-
-            {pagrindinisDarbas?.video_url && (
-              <div className="mx-auto mt-7 max-w-4xl overflow-hidden rounded-2xl border border-slate-700 bg-black shadow-2xl sm:mt-9">
-                <video
-                  src={pagrindinisDarbas.video_url}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  controls
-                  preload="metadata"
-                  className="aspect-video w-full object-cover"
-                />
-              </div>
-            )}
-
-            <div className="mx-auto mt-6 max-w-4xl">
-              <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-center">
-                <p className="font-black text-emerald-300">
-                  Kandidatūra per 1 minutę
+                <p className="mt-4 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">
+                  Atlyginimas pagal patirtį ir kvalifikaciją.
                 </p>
-              </div>
 
-              <div className="mt-5 flex flex-col items-stretch justify-center gap-3 sm:flex-row">
-                <Link
-                  href={pagrindineRegistracija}
-                  className="flex items-center justify-center rounded-2xl bg-blue-600 px-8 py-4 text-center text-lg font-black text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500"
-                >
-                  Kandidatuoti dabar
-                </Link>
+                <div className="mt-5 inline-flex rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3">
+                  <p className="font-black text-emerald-300">
+                    Kandidatūra per 1 minutę
+                  </p>
+                </div>
 
-                <Link
-                  href="#darbai"
-                  className="flex items-center justify-center rounded-2xl border border-slate-600 bg-slate-900 px-8 py-4 text-center font-bold text-white transition hover:border-slate-400 hover:bg-slate-800"
-                >
-                  Žiūrėti darbo pasiūlymą
-                </Link>
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href={pagrindineRegistracija}
+                    className="flex items-center justify-center rounded-xl bg-blue-600 px-7 py-3.5 text-center font-black text-white shadow-lg transition hover:bg-blue-500"
+                  >
+                    Kandidatuoti dabar
+                  </Link>
+
+                  <Link
+                    href="#darbai"
+                    className="flex items-center justify-center rounded-xl border border-slate-600 bg-slate-900 px-7 py-3.5 text-center font-bold text-white transition hover:bg-slate-800"
+                  >
+                    Darbo pasiūlymai
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
+        {/* DARBO PASIŪLYMAI */}
         <section
           id="darbai"
-          className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16"
+          className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14"
         >
-          <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">
-              Darbo pasiūlymai
-            </p>
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-700">
+                Darbo pasiūlymai
+              </p>
 
-            <h2 className="mt-3 text-3xl font-black text-slate-900 sm:text-4xl">
-              Raskite sau tinkamą poziciją
-            </h2>
+              <h2 className="mt-2 text-3xl font-black text-slate-900">
+                Pasirinkite tinkamą poziciją
+              </h2>
+            </div>
 
-            <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">
-              Pasirinkite darbo pasiūlymą ir pateikite kandidatūrą.
-            </p>
+            {!loading && darbai.length > 0 && (
+              <p className="text-sm font-semibold text-slate-500">
+                Aktyvūs pasiūlymai: {darbai.length}
+              </p>
+            )}
           </div>
 
           {loading && (
-            <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 sm:mt-10">
+            <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-6 text-slate-600">
               Kraunami darbo pasiūlymai...
             </div>
           )}
 
           {errorMessage && (
-            <div className="mt-8 rounded-xl border border-red-200 bg-red-50 p-6 font-semibold text-red-700 sm:mt-10">
+            <div className="mt-7 rounded-2xl border border-red-200 bg-red-50 p-6 font-semibold text-red-700">
               {errorMessage}
             </div>
           )}
@@ -308,284 +247,215 @@ export default function Home() {
           {!loading &&
             !errorMessage &&
             darbai.length === 0 && (
-              <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 sm:mt-10">
+              <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-6 text-slate-600">
                 Šiuo metu aktyvių darbo pasiūlymų nėra.
               </div>
             )}
 
-          <div className="mt-8 space-y-6 sm:mt-10 sm:space-y-8">
-            {darbai.map(
-              (darbas, index) => (
-                <article
-                  key={darbas.id}
-                  className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
-                >
-                  <div className="p-5 sm:p-7">
-                    <div className="flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
-                            <BriefcaseBusiness
-                              className="h-6 w-6"
-                              strokeWidth={2}
-                            />
-                          </div>
+          <div className="mt-7 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {darbai.map((darbas) => (
+              <article
+                key={darbas.id}
+                className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="flex flex-1 flex-col p-5">
+                  {/* VIRŠUS */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                      <BriefcaseBusiness
+                        className="h-5 w-5"
+                        strokeWidth={2}
+                      />
+                    </div>
 
-                          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-black uppercase tracking-wider text-blue-700">
-                            Norvegija
-                          </span>
-                        </div>
+                    <span className="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-blue-700">
+                      Norvegija
+                    </span>
+                  </div>
 
-                        <h3 className="mt-5 text-2xl font-black text-slate-900 sm:text-3xl">
-                          {darbas.pavadinimas}
-                        </h3>
+                  {/* PAVADINIMAS */}
+                  <h3 className="mt-4 text-xl font-black leading-7 text-slate-950">
+                    {darbas.pavadinimas}
+                  </h3>
 
-                        <div className="mt-4 flex items-center gap-2 text-slate-700">
-                          <MapPin
-                            className="h-5 w-5 text-blue-600"
-                            strokeWidth={2}
-                          />
+                  <div className="mt-2 flex items-start gap-2 text-sm text-slate-600">
+                    <MapPin
+                      className="mt-0.5 h-4 w-4 shrink-0 text-blue-600"
+                      strokeWidth={2}
+                    />
 
-                          <span className="font-bold">
-                            {darbas.miestas}, Norvegija
-                          </span>
-                        </div>
+                    <span className="font-semibold">
+                      {darbas.miestas}, Norvegija
+                    </span>
+                  </div>
+
+                  {/* ATLYGINIMAS */}
+                  {darbas.atlyginimas && (
+                    <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                      <div className="flex items-center gap-2">
+                        <Banknote
+                          className="h-5 w-5 text-amber-600"
+                          strokeWidth={2}
+                        />
+
+                        <span className="text-lg font-black text-slate-950">
+                          {darbas.atlyginimas}
+                        </span>
                       </div>
 
-                      {darbas.atlyginimas && (
-                        <div className="rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 shadow-sm">
-                          <p className="text-xs font-black uppercase tracking-wider text-amber-700">
-                            Atlyginimas
-                          </p>
-
-                          <div className="mt-1 flex items-center gap-2">
-                            <Banknote
-                              className="h-6 w-6 text-amber-600"
-                              strokeWidth={2}
-                            />
-
-                            <span className="text-xl font-black text-slate-950 sm:text-2xl">
-                              {darbas.atlyginimas}
-                            </span>
-                          </div>
-
-                          <p className="mt-2 text-sm font-medium text-slate-600">
-                            Pagal patirtį ir kvalifikaciją
-                          </p>
-                        </div>
-                      )}
+                      <p className="mt-1 text-xs font-semibold text-amber-800">
+                        Pagal patirtį ir kvalifikaciją
+                      </p>
                     </div>
+                  )}
 
-                    <div className="mt-6 sm:hidden">
-                      <Link
-                        href={`/registracija?darbas=${darbas.id}`}
-                        className="flex w-full items-center justify-center rounded-2xl bg-blue-600 px-6 py-4 text-lg font-black text-white shadow-md transition hover:bg-blue-700"
-                      >
-                        Kandidatuoti dabar
-                      </Link>
+                  {/* SVARBIAUSIA INFORMACIJA */}
+                  <div className="mt-4 grid gap-2">
+                    <MiniDetail
+                      icon={
+                        <Clock3
+                          className="h-4 w-4"
+                          strokeWidth={2}
+                        />
+                      }
+                      label="Grafikas"
+                      value={darbas.grafikas}
+                    />
+
+                    <MiniDetail
+                      icon={
+                        <CalendarDays
+                          className="h-4 w-4"
+                          strokeWidth={2}
+                        />
+                      }
+                      label="Rotacija"
+                      value={darbas.rotacija}
+                    />
+
+                    <MiniDetail
+                      icon={
+                        <House
+                          className="h-4 w-4"
+                          strokeWidth={2}
+                        />
+                      }
+                      label="Apgyvendinimas"
+                      value={darbas.apgyvendinimas}
+                    />
+
+                    <MiniDetail
+                      icon={
+                        <UserRoundCheck
+                          className="h-4 w-4"
+                          strokeWidth={2}
+                        />
+                      }
+                      label="Patirtis"
+                      value={darbas.patirtis_reikalavimas}
+                    />
+                  </div>
+
+                  {/* TRUMPAS APRAŠYMAS */}
+                  {darbas.aprasymas && (
+                    <div className="mt-4 border-t border-slate-100 pt-4">
+                      <p className="max-h-24 overflow-hidden text-sm leading-6 text-slate-600">
+                        {darbas.aprasymas}
+                      </p>
                     </div>
+                  )}
 
-                    {index !== 0 &&
-                      darbas.video_url && (
-                        <div className="mt-6 overflow-hidden rounded-2xl bg-black shadow-sm">
-                          <video
-                            src={darbas.video_url}
-                            autoPlay
-                            muted
-                            loop
-                            playsInline
-                            controls
-                            preload="metadata"
-                            className="aspect-video w-full object-cover"
-                          />
-                        </div>
-                      )}
-
-                    <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                      <DetailCard
-                        icon={
-                          <Clock3
-                            className="h-5 w-5"
-                            strokeWidth={2}
-                          />
-                        }
-                        label="Grafikas"
-                        value={darbas.grafikas}
-                        variant="blue"
-                      />
-
-                      <DetailCard
-                        icon={
-                          <CalendarDays
-                            className="h-5 w-5"
-                            strokeWidth={2}
-                          />
-                        }
-                        label="Rotacija"
-                        value={darbas.rotacija}
-                        variant="violet"
-                      />
-
-                      <DetailCard
-                        icon={
-                          <House
-                            className="h-5 w-5"
-                            strokeWidth={2}
-                          />
-                        }
-                        label="Apgyvendinimas"
-                        value={
-                          darbas.apgyvendinimas
-                        }
-                        variant="green"
-                      />
-
-                      <DetailCard
-                        icon={
-                          <Plane
-                            className="h-5 w-5"
-                            strokeWidth={2}
-                          />
-                        }
-                        label="Kelionė"
-                        value={darbas.kelione}
-                        variant="orange"
-                      />
-
-                      <DetailCard
-                        icon={
-                          <UserRoundCheck
-                            className="h-5 w-5"
-                            strokeWidth={2}
-                          />
-                        }
-                        label="Patirtis"
-                        value={
-                          darbas.patirtis_reikalavimas
-                        }
-                        variant="cyan"
-                      />
-
-                      <DetailCard
-                        icon={
-                          <Languages
-                            className="h-5 w-5"
-                            strokeWidth={2}
-                          />
-                        }
-                        label="Kalbos"
-                        value={
-                          darbas.kalba_reikalavimas
-                        }
-                        variant="blue"
-                      />
-
-                      <DetailCard
-                        icon={
-                          <Car
-                            className="h-5 w-5"
-                            strokeWidth={2}
-                          />
-                        }
-                        label="Vairuotojo pažymėjimas"
-                        value={
-                          darbas.vairuotojo_pazymejimas
-                        }
-                        variant="slate"
-                      />
-
-                      <DetailCard
-                        icon={
-                          <CalendarDays
-                            className="h-5 w-5"
-                            strokeWidth={2}
-                          />
-                        }
-                        label="Darbo pradžia"
-                        value={
-                          darbas.darbo_pradzia
-                        }
-                        variant="green"
-                      />
-                    </div>
-
-                    {darbas.aprasymas && (
-                      <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
-                        <h4 className="text-lg font-black text-slate-900">
-                          Darbo aprašymas
-                        </h4>
-
-                        <p className="mt-3 whitespace-pre-wrap leading-8 text-slate-600">
-                          {darbas.aprasymas}
-                        </p>
+                  {/* PAPILDOMI DUOMENYS */}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {darbas.kalba_reikalavimas && (
+                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-cyan-50 px-2.5 py-1.5 text-xs font-bold text-cyan-800">
+                        <Languages className="h-3.5 w-3.5" />
+                        {darbas.kalba_reikalavimas}
                       </div>
                     )}
 
-                    <div className="mt-8 hidden sm:block">
-                      <Link
-                        href={`/registracija?darbas=${darbas.id}`}
-                        className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-8 py-4 text-lg font-black text-white shadow-md transition hover:bg-blue-700"
-                      >
-                        Kandidatuoti dabar
-                      </Link>
-                    </div>
+                    {darbas.vairuotojo_pazymejimas && (
+                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-bold text-slate-700">
+                        <Car className="h-3.5 w-3.5" />
+                        {darbas.vairuotojo_pazymejimas}
+                      </div>
+                    )}
+
+                    {darbas.kelione && (
+                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-orange-50 px-2.5 py-1.5 text-xs font-bold text-orange-800">
+                        <Plane className="h-3.5 w-3.5" />
+                        {darbas.kelione}
+                      </div>
+                    )}
+
+                    {darbas.darbo_pradzia && (
+                      <div className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-800">
+                        <CalendarDays className="h-3.5 w-3.5" />
+                        {darbas.darbo_pradzia}
+                      </div>
+                    )}
                   </div>
-                </article>
-              )
-            )}
+
+                  {/* MYGTUKAS */}
+                  <div className="mt-auto pt-5">
+                    <Link
+                      href={`/registracija?darbas=${darbas.id}`}
+                      className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-5 py-3.5 font-black text-white transition hover:bg-blue-700"
+                    >
+                      Kandidatuoti
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
-        <section className="border-y border-slate-200 bg-white px-4 py-12 sm:px-6 sm:py-14">
-          <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
-            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100">
-                <BriefcaseBusiness
-                  className="h-6 w-6 text-blue-700"
-                  strokeWidth={2}
-                />
-              </div>
+        {/* APATINĖ INFORMACIJA */}
+        <section className="border-y border-slate-200 bg-white px-4 py-10 sm:px-6">
+          <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+              <BriefcaseBusiness
+                className="h-6 w-6 text-blue-700"
+                strokeWidth={2}
+              />
 
-              <h3 className="mt-4 text-lg font-black text-slate-900">
+              <h3 className="mt-3 font-black text-slate-900">
                 Įvairios statybų pozicijos
               </h3>
 
-              <p className="mt-2 leading-7 text-slate-600">
-                Atraskite darbą pagal savo patirtį ir specializaciją.
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Pasirinkite darbą pagal savo patirtį ir specializaciją.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100">
-                <Building2
-                  className="h-6 w-6 text-emerald-700"
-                  strokeWidth={2}
-                />
-              </div>
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+              <UserRoundCheck
+                className="h-6 w-6 text-emerald-700"
+                strokeWidth={2}
+              />
 
-              <h3 className="mt-4 text-lg font-black text-slate-900">
+              <h3 className="mt-3 font-black text-slate-900">
                 Greitas kontaktas
               </h3>
 
-              <p className="mt-2 leading-7 text-slate-600">
+              <p className="mt-1 text-sm leading-6 text-slate-600">
                 Pateikite kandidatūrą ir su jumis susisieksime.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100">
-                <MapPin
-                  className="h-6 w-6 text-amber-700"
-                  strokeWidth={2}
-                />
-              </div>
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+              <Clock3
+                className="h-6 w-6 text-amber-700"
+                strokeWidth={2}
+              />
 
-              <h3 className="mt-4 text-lg font-black text-slate-900">
+              <h3 className="mt-3 font-black text-slate-900">
                 Trumpa registracija
               </h3>
 
-              <p className="mt-2 leading-7 text-slate-600">
-                Keli žingsniai ir kandidatūra pateikta.
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Kandidatūros anketa užpildoma keliais žingsniais.
               </p>
             </div>
           </div>
