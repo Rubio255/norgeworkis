@@ -8,7 +8,7 @@ export const metadata = {
 export default function SaugumasPage() {
   return (
     <>
-      <main className="min-h-screen bg-page px-6 py-12">
+      <main className="min-h-screen px-6 py-12">
         <article className="mx-auto max-w-4xl rounded-[20px] border border-line bg-surface p-8 shadow-card md:p-12">
           <NorgeworkisLogo />
 
@@ -143,7 +143,7 @@ export default function SaugumasPage() {
               </p>
             </section>
 
-            <section className="rounded-xl border border-line bg-surface-2 p-6">
+            <section className="rounded-xl border border-line bg-surface-2/60 p-6">
               <h2 className="text-xl font-bold text-fg">
                 Duomenų valdytojas
               </h2>

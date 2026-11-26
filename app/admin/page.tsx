@@ -1533,7 +1533,7 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-page p-8">
+      <main className="min-h-screen p-8">
         <div className="mx-auto max-w-7xl">
           Kraunama...
         </div>
@@ -1546,7 +1546,7 @@ export default function AdminPage() {
   ) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-page px-6">
-        <div className="w-full max-w-md rounded-[20px] bg-surface p-8 shadow-card">
+        <div className="w-full max-w-md rounded-[20px] glass p-8 shadow-card">
           <h1 className="text-3xl font-bold text-fg">
             Norgeworkis administravimas
           </h1>
@@ -1611,7 +1611,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-page">
+    <main className="min-h-screen">
       <header className="bg-ink px-6 py-5 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div>
@@ -1638,7 +1638,7 @@ export default function AdminPage() {
 
       <div className="mx-auto max-w-7xl px-6 py-10">
         <div className="grid gap-5 md:grid-cols-3">
-          <div className="rounded-[20px] bg-surface p-6 shadow-card">
+          <div className="rounded-[20px] glass p-6 shadow-card">
             <div className="text-muted">
               Naujos anketos
             </div>
@@ -1648,7 +1648,7 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="rounded-[20px] bg-surface p-6 shadow-card">
+          <div className="rounded-[20px] glass p-6 shadow-card">
             <div className="text-muted">
               Išsiųstos
             </div>
@@ -1658,7 +1658,7 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="rounded-[20px] bg-surface p-6 shadow-card">
+          <div className="rounded-[20px] glass p-6 shadow-card">
             <div className="text-muted">
               Visos anketos
             </div>
@@ -1676,7 +1676,7 @@ export default function AdminPage() {
             Kandidatų anketos
           </h2>
 
-          <div className="mt-6 rounded-[20px] bg-surface p-5 shadow-card">
+          <div className="mt-6 rounded-[20px] glass p-5 shadow-card">
             <div className="flex flex-wrap gap-2">
               {(
                 [
@@ -1699,7 +1699,7 @@ export default function AdminPage() {
                   className={`rounded-xl px-4 py-2 font-semibold ${
                     filtras === item
                       ? "bg-brand text-brand-fg"
-                      : "bg-surface-2 text-fg/80"
+                      : "bg-surface-2/60 text-fg/80"
                   }`}
                 >
                   {item}
@@ -1804,7 +1804,7 @@ export default function AdminPage() {
                   onClick={
                     downloadSelectedExcel
                   }
-                  className="rounded-xl bg-accent px-5 py-3 font-bold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40 shadow-accent"
+                  className="rounded-xl bg-accent px-5 py-3 font-bold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40 shadow-accent shine"
                 >
                   Atsisiųsti Excel
                 </button>
@@ -1847,7 +1847,7 @@ export default function AdminPage() {
                   key={
                     kandidatas.id
                   }
-                  className="rounded-[20px] bg-surface p-6 shadow-card"
+                  className="rounded-[20px] glass p-6 shadow-card"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-5">
                     <div className="flex gap-4">
@@ -2038,7 +2038,7 @@ export default function AdminPage() {
 
             {filteredCandidates.length ===
               0 && (
-              <div className="rounded-[20px] bg-surface p-8 text-center text-muted">
+              <div className="rounded-[20px] glass p-8 text-center text-muted">
                 Kandidatų pagal pasirinktą filtrą nėra.
               </div>
             )}
@@ -2052,7 +2052,7 @@ export default function AdminPage() {
 
           <form
             onSubmit={addJob}
-            className="mt-6 rounded-[20px] bg-surface p-6 shadow-card"
+            className="mt-6 rounded-[20px] glass p-6 shadow-card"
           >
             <h3 className="text-xl font-bold">
               Naujas darbo pasiūlymas
@@ -2252,7 +2252,7 @@ export default function AdminPage() {
                   key={
                     darbas.id
                   }
-                  className="rounded-[20px] bg-surface p-6 shadow-card"
+                  className="rounded-[20px] glass p-6 shadow-card"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <span
@@ -2542,7 +2542,7 @@ export default function AdminPage() {
                     )}
 
                     <div className="mt-5 flex flex-wrap items-center gap-3">
-                      <label className="cursor-pointer rounded-xl bg-accent px-5 py-3 font-bold text-accent-fg hover:bg-accent-hover shadow-accent">
+                      <label className="cursor-pointer rounded-xl bg-accent px-5 py-3 font-bold text-accent-fg hover:bg-accent-hover shadow-accent shine">
                         {uploadingVideoJobId ===
                         darbas.id
                           ? "Įkeliama..."
@@ -2621,7 +2621,7 @@ export default function AdminPage() {
 
             {darbai.length ===
               0 && (
-              <div className="rounded-[20px] bg-surface p-8 text-center text-muted">
+              <div className="rounded-[20px] glass p-8 text-center text-muted">
                 Darbo pasiūlymų nėra.
               </div>
             )}

@@ -818,11 +818,11 @@ export default function RegistracijaClient() {
         }
       />
 
-      <main className="min-h-screen bg-page">
+      <main className="min-h-screen">
         <SiteHeader />
 
         <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-12">
-          <div className="rounded-[20px] bg-surface p-5 shadow-card sm:p-8 md:p-10">
+          <div className="rounded-[20px] glass p-5 shadow-card sm:p-8 md:p-10">
             <div>
               <p className="text-sm font-bold uppercase tracking-wider text-brand">
                 Kandidato anketa
@@ -849,14 +849,14 @@ export default function RegistracijaClient() {
             </div>
 
             {darbasLoading && (
-              <div className="mt-6 rounded-xl bg-surface-2 p-5 text-muted">
+              <div className="mt-6 rounded-xl bg-surface-2/60 p-5 text-muted">
                 Kraunamas darbo pasiūlymas...
               </div>
             )}
 
             {!darbasLoading &&
               darbas && (
-                <div className="mt-6 rounded-xl border border-line bg-surface-2 p-5">
+                <div className="mt-6 rounded-xl border border-line bg-surface-2/60 p-5">
                   <p className="text-xs font-bold uppercase tracking-wider text-muted">
                     Kandidatuojate į
                   </p>
@@ -1291,7 +1291,7 @@ export default function RegistracijaClient() {
                 </label>
               </div>
 
-              <div className="rounded-xl border border-line bg-surface-2 p-4">
+              <div className="rounded-xl border border-line bg-surface-2/60 p-4">
                 <p className="mb-3 text-sm text-muted">
                   Apsaugos nuo automatinių užklausų patikrinimas
                 </p>
@@ -1315,7 +1315,7 @@ export default function RegistracijaClient() {
                   loading ||
                   !turnstileToken
                 }
-                className="w-full rounded-full bg-accent px-6 py-4 text-lg font-extrabold text-accent-fg shadow-accent transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-full bg-accent px-6 py-4 text-lg font-extrabold text-accent-fg shadow-accent transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 shine"
               >
                 {loading
                   ? "Siunčiama..."

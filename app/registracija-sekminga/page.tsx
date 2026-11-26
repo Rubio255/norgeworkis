@@ -2,10 +2,10 @@ import Link from "next/link";
 
 export default function RegistracijaSekmingaPage() {
   return (
-    <main className="min-h-screen bg-page">
+    <main className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-12">
-        <div className="w-full rounded-[20px] bg-surface p-8 text-center shadow-card md:p-12">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-ok-bg text-3xl text-ok">
+        <div className="w-full rounded-[20px] glass p-8 text-center shadow-card md:p-12">
+          <div className="orb orb-lime orb-spark float mx-auto h-16 w-16 rounded-2xl text-3xl font-bold">
             ✓
           </div>
 
@@ -22,7 +22,7 @@ export default function RegistracijaSekmingaPage() {
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href="/"
-              className="rounded-full bg-accent px-6 py-3 font-extrabold text-accent-fg shadow-accent transition hover:bg-accent-hover"
+              className="rounded-full bg-accent px-6 py-3 font-extrabold text-accent-fg shadow-accent transition hover:bg-accent-hover shine"
             >
               Grįžti į darbo pasiūlymus
             </Link>

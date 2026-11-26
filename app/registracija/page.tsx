@@ -5,9 +5,9 @@ export default function RegistracijaPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-page px-6 py-12">
+        <main className="min-h-screen px-6 py-12">
           <div className="mx-auto max-w-3xl">
-            <div className="rounded-[20px] bg-surface p-8 shadow-card">
+            <div className="rounded-[20px] glass p-8 shadow-card">
               Kraunama kandidato anketa...
             </div>
           </div>
