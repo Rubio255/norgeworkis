@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
+/* Ridu dizaino sistema: tos pačios spalvos, šriftai, kampai ir šešėliai kaip Ridu programėlėje */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --bg: #f3f5f9; --surface: #ffffff; --surface-2: #eef1f6; --fg: #14211f; --muted: #5b6b68; --line: #e1e8e5;
+  --brand: #0f4c45; --brand-hover: #0b3a35; --brand-fg: #ffffff; --brand-soft: #e3efec;
+  --accent: #f2b705; --accent-hover: #e0a800; --accent-fg: #1e1a00; --accent-soft: #fff5d4;
+  --navy: #14254f; --ink: #0d2a26;
+  --ok: #1f7a4d; --ok-bg: #dcf2e6; --warn: #9a6300; --warn-bg: #fdf0cf; --bad: #b3261e; --bad-bg: #fbe1de; --info: #1d5b9a; --info-bg: #dde9f7;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #0e1514; --surface: #162120; --surface-2: #1f2d2b; --fg: #e6efed; --muted: #9db0ac; --line: #2c3d3a;
+    --brand: #5fc2b4; --brand-hover: #7dd0c4; --brand-fg: #062420; --brand-soft: #193430;
+    --accent: #f5c53a; --accent-hover: #f7d062; --accent-fg: #1e1a00; --accent-soft: #3a3110;
+    --navy: #1b2d5c; --ink: #0a1f1c;
+    --ok: #6fd49c; --ok-bg: #163526; --warn: #f0c062; --warn-bg: #3a2e10; --bad: #f2958c; --bad-bg: #3d1916; --info: #8dbcf0; --info-bg: #172a40;
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-page: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-navy: var(--navy);
+  --color-ink: var(--ink);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+
+  --font-sans: var(--font-body), system-ui, sans-serif;
+  --font-display: var(--font-display), system-ui, sans-serif;
+
+  --shadow-card: 0 2px 12px rgb(23 35 60 / .07);
+  --shadow-card-lg: 0 10px 30px rgb(23 35 60 / .12);
+  --shadow-accent: 0 6px 16px rgb(242 183 5 / .35);
 }
+
+@layer base {
+  *, ::before, ::after, ::backdrop { border-color: var(--line); }
+  input, select, textarea { background-color: var(--surface); color: var(--fg); }
+  input::placeholder, textarea::placeholder { color: var(--muted); opacity: .8; }
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display), system-ui, sans-serif; text-wrap: balance; letter-spacing: -0.01em; }
+
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }

@@ -1,6 +1,22 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { Bricolage_Grotesque, Manrope } from "next/font/google";
 import "./globals.css";
+
+const display = Bricolage_Grotesque({
+  variable: "--font-display",
+  subsets: ["latin", "latin-ext"],
+  weight: ["600", "700", "800"],
+});
+
+const body = Manrope({
+  variable: "--font-body",
+  subsets: ["latin", "latin-ext"],
+});
+
+export const viewport: Viewport = {
+  themeColor: "#0f4c45",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.norgeworkis.lt"),
@@ -91,7 +107,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="lt">
-      <body>
+      <body className={`${display.variable} ${body.variable} antialiased`}>
         {children}
 
         <Script

@@ -10,23 +10,23 @@ export const metadata = {
 export default function PrivatumoPolitikaPage() {
   return (
     <>
-      <main className="min-h-screen bg-slate-100 px-6 py-12">
-        <article className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-12">
+      <main className="min-h-screen bg-page px-6 py-12">
+        <article className="mx-auto max-w-4xl rounded-[20px] border border-line bg-surface p-8 shadow-card md:p-12">
           <NorgeworkisLogo />
 
-          <div className="mt-8 border-b border-slate-200 pb-8">
-            <h1 className="text-4xl font-bold text-slate-900">
+          <div className="mt-8 border-b border-line pb-8">
+            <h1 className="text-4xl font-bold text-fg">
               Privatumo politika
             </h1>
 
-            <p className="mt-4 text-sm text-slate-500">
+            <p className="mt-4 text-sm text-muted">
               Paskutinį kartą atnaujinta: 2026 m. rugpjūčio 27 d.
             </p>
           </div>
 
-          <div className="mt-10 space-y-10 leading-7 text-slate-700">
+          <div className="mt-10 space-y-10 leading-7 text-fg/80">
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 1. Duomenų valdytojas
               </h2>
 
@@ -35,7 +35,7 @@ export default function PrivatumoPolitikaPage() {
                 Įmonių veiklos analizė, MB.
               </p>
 
-              <div className="mt-4 rounded-xl bg-slate-50 p-5">
+              <div className="mt-4 rounded-xl bg-surface-2 p-5">
                 <p>
                   <strong>Įmonių veiklos analizė, MB</strong>
                 </p>
@@ -52,7 +52,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 2. Kokius asmens duomenis renkame
               </h2>
 
@@ -81,7 +81,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 3. Duomenų tvarkymo tikslai
               </h2>
 
@@ -114,7 +114,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 4. Duomenų tvarkymo teisinis pagrindas
               </h2>
 
@@ -134,7 +134,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 5. Duomenų perdavimas potencialiems darbdaviams
               </h2>
 
@@ -159,7 +159,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 6. Paslaugų teikėjai
               </h2>
 
@@ -178,7 +178,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 7. Kandidatų duomenų ir CV saugumas
               </h2>
 
@@ -200,7 +200,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 8. Duomenų saugojimo laikotarpis
               </h2>
 
@@ -218,7 +218,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 9. Kandidato teisės
               </h2>
 
@@ -251,7 +251,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 10. Sutikimo atšaukimas
               </h2>
 
@@ -268,7 +268,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 11. Skundų pateikimas
               </h2>
 
@@ -285,7 +285,7 @@ export default function PrivatumoPolitikaPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 12. Privatumo politikos pakeitimai
               </h2>
 
@@ -301,8 +301,8 @@ export default function PrivatumoPolitikaPage() {
               </p>
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-              <h2 className="text-xl font-bold text-slate-900">
+            <section className="rounded-xl border border-line bg-surface-2 p-6">
+              <h2 className="text-xl font-bold text-fg">
                 Kontaktai dėl asmens duomenų
               </h2>
 

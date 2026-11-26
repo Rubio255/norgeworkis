@@ -1533,7 +1533,7 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-100 p-8">
+      <main className="min-h-screen bg-page p-8">
         <div className="mx-auto max-w-7xl">
           Kraunama...
         </div>
@@ -1545,9 +1545,9 @@ export default function AdminPage() {
     userEmail !== ADMIN_EMAIL
   ) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-100 px-6">
-        <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow">
-          <h1 className="text-3xl font-bold text-slate-900">
+      <main className="flex min-h-screen items-center justify-center bg-page px-6">
+        <div className="w-full max-w-md rounded-[20px] bg-surface p-8 shadow-card">
+          <h1 className="text-3xl font-bold text-fg">
             Norgeworkis administravimas
           </h1>
 
@@ -1568,7 +1568,7 @@ export default function AdminPage() {
                   e.target.value
                 )
               }
-              className="w-full rounded-lg border px-4 py-3"
+              className="w-full rounded-xl border px-4 py-3"
             />
 
             <input
@@ -1582,11 +1582,11 @@ export default function AdminPage() {
                   e.target.value
                 )
               }
-              className="w-full rounded-lg border px-4 py-3"
+              className="w-full rounded-xl border px-4 py-3"
             />
 
             {loginError && (
-              <div className="rounded-lg bg-red-50 p-4 text-red-700">
+              <div className="rounded-xl bg-bad-bg p-4 text-bad">
                 {
                   loginError
                 }
@@ -1598,7 +1598,7 @@ export default function AdminPage() {
               disabled={
                 loginLoading
               }
-              className="w-full rounded-lg bg-slate-900 px-5 py-3 font-bold text-white disabled:opacity-40"
+              className="w-full rounded-xl bg-brand px-5 py-3 font-bold text-brand-fg disabled:opacity-40"
             >
               {loginLoading
                 ? "Jungiama..."
@@ -1611,15 +1611,15 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100">
-      <header className="bg-slate-950 px-6 py-5 text-white">
+    <main className="min-h-screen bg-page">
+      <header className="bg-ink px-6 py-5 text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">
               Norgeworkis administravimas
             </h1>
 
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-white/70">
               {userEmail}
             </p>
           </div>
@@ -1629,7 +1629,7 @@ export default function AdminPage() {
             onClick={
               handleLogout
             }
-            className="rounded-lg border border-slate-700 px-4 py-2 font-semibold"
+            className="rounded-xl border border-white/20 px-4 py-2 font-semibold"
           >
             Atsijungti
           </button>
@@ -1638,8 +1638,8 @@ export default function AdminPage() {
 
       <div className="mx-auto max-w-7xl px-6 py-10">
         <div className="grid gap-5 md:grid-cols-3">
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="text-slate-600">
+          <div className="rounded-[20px] bg-surface p-6 shadow-card">
+            <div className="text-muted">
               Naujos anketos
             </div>
 
@@ -1648,8 +1648,8 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="text-slate-600">
+          <div className="rounded-[20px] bg-surface p-6 shadow-card">
+            <div className="text-muted">
               Išsiųstos
             </div>
 
@@ -1658,8 +1658,8 @@ export default function AdminPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="text-slate-600">
+          <div className="rounded-[20px] bg-surface p-6 shadow-card">
+            <div className="text-muted">
               Visos anketos
             </div>
 
@@ -1676,7 +1676,7 @@ export default function AdminPage() {
             Kandidatų anketos
           </h2>
 
-          <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm">
+          <div className="mt-6 rounded-[20px] bg-surface p-5 shadow-card">
             <div className="flex flex-wrap gap-2">
               {(
                 [
@@ -1696,10 +1696,10 @@ export default function AdminPage() {
                       item
                     )
                   }
-                  className={`rounded-lg px-4 py-2 font-semibold ${
+                  className={`rounded-xl px-4 py-2 font-semibold ${
                     filtras === item
-                      ? "bg-slate-900 text-white"
-                      : "bg-slate-100 text-slate-700"
+                      ? "bg-brand text-brand-fg"
+                      : "bg-surface-2 text-fg/80"
                   }`}
                 >
                   {item}
@@ -1715,7 +1715,7 @@ export default function AdminPage() {
                 )
               }
               placeholder="Ieškoti kandidato..."
-              className="mt-5 w-full rounded-lg border px-4 py-3"
+              className="mt-5 w-full rounded-xl border px-4 py-3"
             />
 
             <div className="mt-5 border-t pt-5">
@@ -1751,7 +1751,7 @@ export default function AdminPage() {
                       e.target.value
                     )
                   }
-                  className="min-w-72 rounded-lg border px-4 py-3"
+                  className="min-w-72 rounded-xl border px-4 py-3"
                 >
                   <option value="">
                     Pasirinkite darbdavį
@@ -1788,7 +1788,7 @@ export default function AdminPage() {
                   onClick={
                     sendSelectedToEmployer
                   }
-                  className="rounded-lg bg-green-700 px-5 py-3 font-bold text-white hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-xl bg-brand px-5 py-3 font-bold text-brand-fg hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {sending
                     ? "Siunčiama..."
@@ -1804,7 +1804,7 @@ export default function AdminPage() {
                   onClick={
                     downloadSelectedExcel
                   }
-                  className="rounded-lg bg-blue-700 px-5 py-3 font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-xl bg-accent px-5 py-3 font-bold text-accent-fg hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40 shadow-accent"
                 >
                   Atsisiųsti Excel
                 </button>
@@ -1822,7 +1822,7 @@ export default function AdminPage() {
                       )
                     )
                   }
-                  className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-xl border border-bad/30 px-5 py-3 font-semibold text-bad hover:bg-bad-bg disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Ištrinti pažymėtas
                 </button>
@@ -1831,7 +1831,7 @@ export default function AdminPage() {
           </div>
 
           {errorMessage && (
-            <div className="mt-5 rounded-lg bg-red-50 p-4 text-red-700">
+            <div className="mt-5 rounded-xl bg-bad-bg p-4 text-bad">
               {
                 errorMessage
               }
@@ -1847,7 +1847,7 @@ export default function AdminPage() {
                   key={
                     kandidatas.id
                   }
-                  className="rounded-2xl bg-white p-6 shadow-sm"
+                  className="rounded-[20px] bg-surface p-6 shadow-card"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-5">
                     <div className="flex gap-4">
@@ -1874,7 +1874,7 @@ export default function AdminPage() {
                           }
                         </h3>
 
-                        <p className="mt-1 text-slate-600">
+                        <p className="mt-1 text-muted">
                           {
                             kandidatas.profesija
                           }
@@ -1893,7 +1893,7 @@ export default function AdminPage() {
                           e.target.value
                         )
                       }
-                      className="rounded-lg border px-4 py-3"
+                      className="rounded-xl border px-4 py-3"
                     >
                       <option value="Naujas">
                         Naujas
@@ -1977,7 +1977,7 @@ export default function AdminPage() {
                         Apie kandidatą:
                       </strong>
 
-                      <p className="mt-2 whitespace-pre-wrap text-slate-700">
+                      <p className="mt-2 whitespace-pre-wrap text-fg/80">
                         {
                           kandidatas.apie
                         }
@@ -1996,7 +1996,7 @@ export default function AdminPage() {
                       disabled={
                         !kandidatas.cv_path
                       }
-                      className="rounded-lg border px-4 py-2 disabled:opacity-40"
+                      className="rounded-xl border px-4 py-2 disabled:opacity-40"
                     >
                       {kandidatas.cv_path
                         ? "Atidaryti CV"
@@ -2012,7 +2012,7 @@ export default function AdminPage() {
                           ]
                         )
                       }
-                      className="rounded-lg border border-red-300 px-4 py-2 text-red-700 hover:bg-red-50"
+                      className="rounded-xl border border-bad/30 px-4 py-2 text-bad hover:bg-bad-bg"
                     >
                       Ištrinti anketą
                     </button>
@@ -2030,7 +2030,7 @@ export default function AdminPage() {
                       )
                     }
                     placeholder="Administratoriaus pastabos"
-                    className="mt-5 w-full rounded-lg border px-4 py-3"
+                    className="mt-5 w-full rounded-xl border px-4 py-3"
                   />
                 </article>
               )
@@ -2038,7 +2038,7 @@ export default function AdminPage() {
 
             {filteredCandidates.length ===
               0 && (
-              <div className="rounded-2xl bg-white p-8 text-center text-slate-500">
+              <div className="rounded-[20px] bg-surface p-8 text-center text-muted">
                 Kandidatų pagal pasirinktą filtrą nėra.
               </div>
             )}
@@ -2052,7 +2052,7 @@ export default function AdminPage() {
 
           <form
             onSubmit={addJob}
-            className="mt-6 rounded-2xl bg-white p-6 shadow-sm"
+            className="mt-6 rounded-[20px] bg-surface p-6 shadow-card"
           >
             <h3 className="text-xl font-bold">
               Naujas darbo pasiūlymas
@@ -2070,7 +2070,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Pareigos"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2084,7 +2084,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Miestas / regionas"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2097,7 +2097,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Atlyginimas, pvz. 260–290 NOK/val."
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2110,7 +2110,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Grafikas"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2123,7 +2123,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Rotacija"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2136,7 +2136,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Apgyvendinimas"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2149,7 +2149,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Kelionė"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2162,7 +2162,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Reikalaujama patirtis"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2175,7 +2175,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Kalbos reikalavimai"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2188,7 +2188,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Vairuotojo pažymėjimas"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2201,7 +2201,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Darbo pradžia"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <input
@@ -2215,7 +2215,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Darbdavio el. paštas"
-                className="rounded-lg border px-4 py-3"
+                className="rounded-xl border px-4 py-3"
               />
 
               <textarea
@@ -2228,7 +2228,7 @@ export default function AdminPage() {
                   )
                 }
                 placeholder="Darbo aprašymas"
-                className="min-h-32 rounded-lg border px-4 py-3 md:col-span-2"
+                className="min-h-32 rounded-xl border px-4 py-3 md:col-span-2"
               />
             </div>
 
@@ -2237,7 +2237,7 @@ export default function AdminPage() {
               disabled={
                 jobLoading
               }
-              className="mt-5 rounded-lg bg-slate-900 px-5 py-3 font-bold text-white disabled:opacity-40"
+              className="mt-5 rounded-xl bg-brand px-5 py-3 font-bold text-brand-fg disabled:opacity-40"
             >
               {jobLoading
                 ? "Kuriama..."
@@ -2252,14 +2252,14 @@ export default function AdminPage() {
                   key={
                     darbas.id
                   }
-                  className="rounded-2xl bg-white p-6 shadow-sm"
+                  className="rounded-[20px] bg-surface p-6 shadow-card"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <span
                       className={`rounded-full px-3 py-1 text-sm font-bold ${
                         darbas.aktyvus
-                          ? "bg-green-100 text-green-800"
-                          : "bg-slate-200 text-slate-700"
+                          ? "bg-ok-bg text-ok"
+                          : "bg-line text-fg/80"
                       }`}
                     >
                       {darbas.aktyvus
@@ -2278,7 +2278,7 @@ export default function AdminPage() {
                           darbas
                         )
                       }
-                      className="rounded-lg border px-4 py-2 font-semibold disabled:opacity-40"
+                      className="rounded-xl border px-4 py-2 font-semibold disabled:opacity-40"
                     >
                       {changingJobId ===
                       darbas.id
@@ -2454,7 +2454,7 @@ export default function AdminPage() {
                     />
 
                     <div>
-                      <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      <label className="mb-1 block text-sm font-semibold text-muted">
                         Darbdavio el. paštas
                       </label>
 
@@ -2467,7 +2467,7 @@ export default function AdminPage() {
                             ""
                           }
                           placeholder="darbdavys@imone.no"
-                          className="min-w-0 flex-1 rounded-lg border px-4 py-3"
+                          className="min-w-0 flex-1 rounded-xl border px-4 py-3"
                         />
 
                         <button
@@ -2481,7 +2481,7 @@ export default function AdminPage() {
                               darbas.id
                             )
                           }
-                          className="rounded-lg bg-green-700 px-4 py-3 font-bold text-white hover:bg-green-800 disabled:opacity-40"
+                          className="rounded-xl bg-brand px-4 py-3 font-bold text-brand-fg hover:bg-brand-hover disabled:opacity-40"
                         >
                           {savingJobEmailId ===
                           darbas.id
@@ -2492,7 +2492,7 @@ export default function AdminPage() {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="mb-1 block text-sm font-semibold text-slate-600">
+                      <label className="mb-1 block text-sm font-semibold text-muted">
                         Aprašymas
                       </label>
 
@@ -2510,17 +2510,17 @@ export default function AdminPage() {
                               null
                           )
                         }
-                        className="min-h-32 w-full rounded-lg border px-4 py-3"
+                        className="min-h-32 w-full rounded-xl border px-4 py-3"
                       />
                     </div>
                   </div>
 
-                  <div className="mt-7 border-t border-slate-200 pt-6">
-                    <h4 className="text-lg font-bold text-slate-900">
+                  <div className="mt-7 border-t border-line pt-6">
+                    <h4 className="text-lg font-bold text-fg">
                       Darbo video
                     </h4>
 
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-muted">
                       MP4 formatas, iki 10 MB.
                     </p>
 
@@ -2542,7 +2542,7 @@ export default function AdminPage() {
                     )}
 
                     <div className="mt-5 flex flex-wrap items-center gap-3">
-                      <label className="cursor-pointer rounded-lg bg-blue-700 px-5 py-3 font-bold text-white hover:bg-blue-800">
+                      <label className="cursor-pointer rounded-xl bg-accent px-5 py-3 font-bold text-accent-fg hover:bg-accent-hover shadow-accent">
                         {uploadingVideoJobId ===
                         darbas.id
                           ? "Įkeliama..."
@@ -2593,7 +2593,7 @@ export default function AdminPage() {
                               darbas
                             )
                           }
-                          className="rounded-lg border border-red-300 px-5 py-3 font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40"
+                          className="rounded-xl border border-bad/30 px-5 py-3 font-semibold text-bad hover:bg-bad-bg disabled:opacity-40"
                         >
                           {removingVideoJobId ===
                           darbas.id
@@ -2611,7 +2611,7 @@ export default function AdminPage() {
                         darbas.id
                       )
                     }
-                    className="mt-7 rounded-lg border border-red-300 px-4 py-2 font-semibold text-red-700 hover:bg-red-50"
+                    className="mt-7 rounded-xl border border-bad/30 px-4 py-2 font-semibold text-bad hover:bg-bad-bg"
                   >
                     Ištrinti darbo pasiūlymą
                   </button>
@@ -2621,7 +2621,7 @@ export default function AdminPage() {
 
             {darbai.length ===
               0 && (
-              <div className="rounded-2xl bg-white p-8 text-center text-slate-500">
+              <div className="rounded-[20px] bg-surface p-8 text-center text-muted">
                 Darbo pasiūlymų nėra.
               </div>
             )}
@@ -2645,7 +2645,7 @@ function JobField({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-semibold text-slate-600">
+      <label className="mb-1 block text-sm font-semibold text-muted">
         {label}
       </label>
 
@@ -2658,7 +2658,7 @@ function JobField({
             e.target.value
           )
         }
-        className="w-full rounded-lg border px-4 py-3"
+        className="w-full rounded-xl border px-4 py-3"
       />
     </div>
   );

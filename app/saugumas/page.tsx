@@ -8,24 +8,24 @@ export const metadata = {
 export default function SaugumasPage() {
   return (
     <>
-      <main className="min-h-screen bg-slate-100 px-6 py-12">
-        <article className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-12">
+      <main className="min-h-screen bg-page px-6 py-12">
+        <article className="mx-auto max-w-4xl rounded-[20px] border border-line bg-surface p-8 shadow-card md:p-12">
           <NorgeworkisLogo />
 
-          <div className="mt-8 border-b border-slate-200 pb-8">
-            <h1 className="text-4xl font-bold text-slate-900">
+          <div className="mt-8 border-b border-line pb-8">
+            <h1 className="text-4xl font-bold text-fg">
               Duomenų saugumas
             </h1>
 
-            <p className="mt-4 text-lg leading-8 text-slate-600">
+            <p className="mt-4 text-lg leading-8 text-muted">
               Informacija apie tai, kaip „Norgeworkis“ saugo kandidatų
               informaciją ir CV.
             </p>
           </div>
 
-          <div className="mt-10 space-y-10 leading-7 text-slate-700">
+          <div className="mt-10 space-y-10 leading-7 text-fg/80">
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 Kandidatų duomenys nėra vieši
               </h2>
 
@@ -42,7 +42,7 @@ export default function SaugumasPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 CV saugojimas
               </h2>
 
@@ -58,7 +58,7 @@ export default function SaugumasPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 Administratoriaus prieiga
               </h2>
 
@@ -74,7 +74,7 @@ export default function SaugumasPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 Prieigos kontrolė
               </h2>
 
@@ -86,7 +86,7 @@ export default function SaugumasPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 Duomenų minimizavimas
               </h2>
 
@@ -98,7 +98,7 @@ export default function SaugumasPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 Kandidatūros perdavimas
               </h2>
 
@@ -115,7 +115,7 @@ export default function SaugumasPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 Techninės saugumo priemonės
               </h2>
 
@@ -128,7 +128,7 @@ export default function SaugumasPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 Pranešimas apie saugumo problemą
               </h2>
 
@@ -143,8 +143,8 @@ export default function SaugumasPage() {
               </p>
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-              <h2 className="text-xl font-bold text-slate-900">
+            <section className="rounded-xl border border-line bg-surface-2 p-6">
+              <h2 className="text-xl font-bold text-fg">
                 Duomenų valdytojas
               </h2>
 

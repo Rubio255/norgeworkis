@@ -818,59 +818,59 @@ export default function RegistracijaClient() {
         }
       />
 
-      <main className="min-h-screen bg-slate-100">
+      <main className="min-h-screen bg-page">
         <SiteHeader />
 
         <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-12">
-          <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-8 md:p-10">
+          <div className="rounded-[20px] bg-surface p-5 shadow-card sm:p-8 md:p-10">
             <div>
-              <p className="text-sm font-bold uppercase tracking-wider text-sky-700">
+              <p className="text-sm font-bold uppercase tracking-wider text-brand">
                 Kandidato anketa
               </p>
 
-              <h1 className="mt-2 text-2xl font-bold text-slate-950 sm:text-3xl">
+              <h1 className="mt-2 text-2xl font-bold text-fg sm:text-3xl">
                 Kandidatuokite į darbą Norvegijoje
               </h1>
 
-              <div className="mt-4 rounded-xl bg-sky-50 p-4">
-                <p className="font-bold text-slate-900">
+              <div className="mt-4 rounded-xl bg-brand-soft p-4">
+                <p className="font-bold text-fg">
                   Užpildymas trunka apie 1 minutę.
                 </p>
 
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="mt-1 text-sm leading-6 text-muted">
                   Įveskite pagrindinę informaciją.
                   CV ir papildoma informacija nėra privalomi.
                 </p>
 
-                <p className="mt-2 font-bold text-sky-700">
+                <p className="mt-2 font-bold text-brand">
                   Su jumis nedelsdami susisieksime.
                 </p>
               </div>
             </div>
 
             {darbasLoading && (
-              <div className="mt-6 rounded-xl bg-slate-100 p-5 text-slate-600">
+              <div className="mt-6 rounded-xl bg-surface-2 p-5 text-muted">
                 Kraunamas darbo pasiūlymas...
               </div>
             )}
 
             {!darbasLoading &&
               darbas && (
-                <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                <div className="mt-6 rounded-xl border border-line bg-surface-2 p-5">
+                  <p className="text-xs font-bold uppercase tracking-wider text-muted">
                     Kandidatuojate į
                   </p>
 
-                  <h2 className="mt-2 text-xl font-bold text-slate-900">
+                  <h2 className="mt-2 text-xl font-bold text-fg">
                     {darbas.pavadinimas}
                   </h2>
 
-                  <p className="mt-1 text-slate-600">
+                  <p className="mt-1 text-muted">
                     {darbas.miestas}, Norvegija
                   </p>
 
                   {darbas.atlyginimas && (
-                    <p className="mt-2 font-semibold text-slate-900">
+                    <p className="mt-2 font-semibold text-fg">
                       {darbas.atlyginimas}
                     </p>
                   )}
@@ -878,13 +878,13 @@ export default function RegistracijaClient() {
               )}
 
             {errorMessage && (
-              <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+              <div className="mt-6 rounded-xl border border-bad/30 bg-bad-bg p-4 text-bad">
                 {errorMessage}
               </div>
             )}
 
             {successMessage && (
-              <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">
+              <div className="mt-6 rounded-xl border border-ok/25 bg-ok-bg p-4 text-ok">
                 {successMessage}
               </div>
             )}
@@ -918,7 +918,7 @@ export default function RegistracijaClient() {
 
               <div className="grid gap-5 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
+                  <label className="mb-2 block font-semibold text-fg/80">
                     Vardas *
                   </label>
 
@@ -935,12 +935,12 @@ export default function RegistracijaClient() {
                     }
                     autoComplete="given-name"
                     placeholder="Pvz. Jonas"
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                    className="w-full rounded-xl border border-line px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
+                  <label className="mb-2 block font-semibold text-fg/80">
                     Telefonas *
                   </label>
 
@@ -956,13 +956,13 @@ export default function RegistracijaClient() {
                     autoComplete="tel"
                     inputMode="tel"
                     placeholder="+37061234567"
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                    className="w-full rounded-xl border border-line px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-2 block font-semibold text-slate-700">
+                <label className="mb-2 block font-semibold text-fg/80">
                   El. paštas *
                 </label>
 
@@ -980,12 +980,12 @@ export default function RegistracijaClient() {
                   autoComplete="email"
                   inputMode="email"
                   placeholder="pvz. jonas@gmail.com"
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                  className="w-full rounded-xl border border-line px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block font-semibold text-slate-700">
+                <label className="mb-2 block font-semibold text-fg/80">
                   Profesija *
                 </label>
 
@@ -997,7 +997,7 @@ export default function RegistracijaClient() {
                       e.target.value
                     )
                   }
-                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                  className="w-full rounded-xl border border-line bg-surface px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                 >
                   <option value="">
                     Pasirinkite profesiją
@@ -1042,7 +1042,7 @@ export default function RegistracijaClient() {
               </div>
 
               <div>
-                <label className="mb-2 block font-semibold text-slate-700">
+                <label className="mb-2 block font-semibold text-fg/80">
                   Darbo patirtis *
                 </label>
 
@@ -1054,7 +1054,7 @@ export default function RegistracijaClient() {
                       e.target.value
                     )
                   }
-                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                  className="w-full rounded-xl border border-line bg-surface px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                 >
                   <option value="">
                     Pasirinkite
@@ -1082,13 +1082,13 @@ export default function RegistracijaClient() {
                 </select>
               </div>
 
-              <div className="border-t border-slate-200 pt-6">
-                <p className="mb-5 text-sm font-bold uppercase tracking-wider text-slate-500">
+              <div className="border-t border-line pt-6">
+                <p className="mb-5 text-sm font-bold uppercase tracking-wider text-muted">
                   Papildoma informacija – neprivaloma
                 </p>
 
                 <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
+                  <label className="mb-2 block font-semibold text-fg/80">
                     Pavardė
                   </label>
 
@@ -1104,14 +1104,14 @@ export default function RegistracijaClient() {
                     }
                     autoComplete="family-name"
                     placeholder="Pvz. Jonaitis"
-                    className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                    className="w-full rounded-xl border border-line px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                   />
                 </div>
               </div>
 
               <div className="grid gap-5 md:grid-cols-2">
                 <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
+                  <label className="mb-2 block font-semibold text-fg/80">
                     Norvegų kalba
                   </label>
 
@@ -1122,7 +1122,7 @@ export default function RegistracijaClient() {
                         e.target.value
                       )
                     }
-                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                    className="w-full rounded-xl border border-line bg-surface px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                   >
                     <option value="">
                       Nenurodyta
@@ -1151,7 +1151,7 @@ export default function RegistracijaClient() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block font-semibold text-slate-700">
+                  <label className="mb-2 block font-semibold text-fg/80">
                     Anglų kalba
                   </label>
 
@@ -1162,7 +1162,7 @@ export default function RegistracijaClient() {
                         e.target.value
                       )
                     }
-                    className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                    className="w-full rounded-xl border border-line bg-surface px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                   >
                     <option value="">
                       Nenurodyta
@@ -1192,7 +1192,7 @@ export default function RegistracijaClient() {
               </div>
 
               <div>
-                <label className="mb-2 block font-semibold text-slate-700">
+                <label className="mb-2 block font-semibold text-fg/80">
                   Trumpai apie save
                 </label>
 
@@ -1205,14 +1205,14 @@ export default function RegistracijaClient() {
                     )
                   }
                   placeholder="Patirtis, kvalifikacija ar kita svarbi informacija."
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3.5 text-base outline-none focus:border-sky-600"
+                  className="w-full rounded-xl border border-line px-4 py-3.5 text-base outline-none focus:border-brand focus:ring-4 focus:ring-brand/15"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="cv"
-                  className="mb-2 block font-semibold text-slate-700"
+                  className="mb-2 block font-semibold text-fg/80"
                 >
                   CV (neprivaloma)
                 </label>
@@ -1227,17 +1227,17 @@ export default function RegistracijaClient() {
                         null
                     )
                   }
-                  className="block w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
+                  className="block w-full rounded-xl border border-line bg-surface px-4 py-3"
                 />
 
                 {cv && (
-                  <p className="mt-2 text-sm font-semibold text-slate-700">
+                  <p className="mt-2 text-sm font-semibold text-fg/80">
                     Pasirinktas failas: {cv.name}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-4 border-t border-slate-200 pt-6">
+              <div className="space-y-4 border-t border-line pt-6">
                 <label className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -1253,12 +1253,12 @@ export default function RegistracijaClient() {
                     className="mt-1 h-5 w-5 shrink-0"
                   />
 
-                  <span className="text-sm leading-6 text-slate-600">
+                  <span className="text-sm leading-6 text-muted">
                     Patvirtinu, kad susipažinau su{" "}
                     <Link
                       href="/privatumo-politika"
                       target="_blank"
-                      className="font-semibold text-sky-700 underline"
+                      className="font-semibold text-brand underline"
                     >
                       privatumo politika
                     </Link>
@@ -1281,7 +1281,7 @@ export default function RegistracijaClient() {
                     className="mt-1 h-5 w-5 shrink-0"
                   />
 
-                  <span className="text-sm leading-6 text-slate-600">
+                  <span className="text-sm leading-6 text-muted">
                     Sutinku, kad mano pateikti kandidatūros duomenys ir,
                     jei pateiktas, CV būtų naudojami kandidatūros
                     administravimui ir galėtų būti perduoti potencialiems
@@ -1291,13 +1291,13 @@ export default function RegistracijaClient() {
                 </label>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <p className="mb-3 text-sm text-slate-600">
+              <div className="rounded-xl border border-line bg-surface-2 p-4">
+                <p className="mb-3 text-sm text-muted">
                   Apsaugos nuo automatinių užklausų patikrinimas
                 </p>
 
                 {!siteKey ? (
-                  <p className="text-sm font-semibold text-red-600">
+                  <p className="text-sm font-semibold text-bad">
                     Trūksta Turnstile Site Key.
                   </p>
                 ) : (
@@ -1315,7 +1315,7 @@ export default function RegistracijaClient() {
                   loading ||
                   !turnstileToken
                 }
-                className="w-full rounded-xl bg-blue-600 px-6 py-4 text-lg font-black text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-full bg-accent px-6 py-4 text-lg font-extrabold text-accent-fg shadow-accent transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading
                   ? "Siunčiama..."

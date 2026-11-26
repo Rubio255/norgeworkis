@@ -2,32 +2,32 @@ import Link from "next/link";
 
 export default function LegalFooter() {
   return (
-    <footer className="border-t border-slate-200 bg-white px-6 py-10">
+    <footer className="border-t border-line bg-surface px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap gap-x-8 gap-y-4 text-sm">
           <Link
             href="/privatumo-politika"
-            className="font-semibold text-slate-600 hover:text-slate-900"
+            className="font-semibold text-muted hover:text-fg"
           >
             Privatumo politika
           </Link>
 
           <Link
             href="/naudojimosi-salygos"
-            className="font-semibold text-slate-600 hover:text-slate-900"
+            className="font-semibold text-muted hover:text-fg"
           >
             Naudojimosi sąlygos
           </Link>
 
           <Link
             href="/saugumas"
-            className="font-semibold text-slate-600 hover:text-slate-900"
+            className="font-semibold text-muted hover:text-fg"
           >
             Duomenų saugumas
           </Link>
         </div>
 
-        <div className="mt-6 border-t border-slate-200 pt-6 text-sm text-slate-500">
+        <div className="mt-6 border-t border-line pt-6 text-sm text-muted">
           <p>
             Norgeworkis – darbo pasiūlymų ir kandidatų pateikimo platforma.
           </p>

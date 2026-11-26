@@ -11,23 +11,23 @@ export const metadata = {
 export default function NaudojimosiSalygosPage() {
   return (
     <>
-      <main className="min-h-screen bg-slate-100 px-6 py-12">
-        <article className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:p-12">
+      <main className="min-h-screen bg-page px-6 py-12">
+        <article className="mx-auto max-w-4xl rounded-[20px] border border-line bg-surface p-8 shadow-card md:p-12">
           <NorgeworkisLogo />
 
-          <div className="mt-8 border-b border-slate-200 pb-8">
-            <h1 className="text-4xl font-bold text-slate-900">
+          <div className="mt-8 border-b border-line pb-8">
+            <h1 className="text-4xl font-bold text-fg">
               Naudojimosi sąlygos
             </h1>
 
-            <p className="mt-4 text-sm text-slate-500">
+            <p className="mt-4 text-sm text-muted">
               Paskutinį kartą atnaujinta: 2026 m. rugpjūčio 27 d.
             </p>
           </div>
 
-          <div className="mt-10 space-y-10 leading-7 text-slate-700">
+          <div className="mt-10 space-y-10 leading-7 text-fg/80">
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 1. Bendrosios nuostatos
               </h2>
 
@@ -49,7 +49,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 2. Platformos paskirtis
               </h2>
 
@@ -67,7 +67,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 3. Kandidatams teikiama paslauga
               </h2>
 
@@ -85,7 +85,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 4. Kandidato pareigos
               </h2>
 
@@ -106,7 +106,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 5. Darbo pasiūlymai
               </h2>
 
@@ -130,7 +130,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 6. Kandidatūros perdavimas darbdaviams
               </h2>
 
@@ -153,14 +153,14 @@ export default function NaudojimosiSalygosPage() {
 
               <Link
                 href="/privatumo-politika"
-                className="mt-4 inline-block font-semibold text-slate-900 underline underline-offset-4 hover:text-slate-600"
+                className="mt-4 inline-block font-semibold text-fg underline underline-offset-4 hover:text-muted"
               >
                 Privatumo politika
               </Link>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 7. Platformos vaidmuo
               </h2>
 
@@ -183,7 +183,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 8. Komerciniai santykiai
               </h2>
 
@@ -196,7 +196,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 9. Svetainės naudojimas
               </h2>
 
@@ -209,7 +209,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 10. Intelektinė nuosavybė
               </h2>
 
@@ -228,7 +228,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 11. Atsakomybės ribojimas
               </h2>
 
@@ -247,7 +247,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 12. Paslaugos veikimo pakeitimai
               </h2>
 
@@ -265,7 +265,7 @@ export default function NaudojimosiSalygosPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-fg">
                 13. Naudojimosi sąlygų pakeitimai
               </h2>
 
@@ -281,8 +281,8 @@ export default function NaudojimosiSalygosPage() {
               </p>
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-              <h2 className="text-xl font-bold text-slate-900">
+            <section className="rounded-xl border border-line bg-surface-2 p-6">
+              <h2 className="text-xl font-bold text-fg">
                 Platformos administratorius
               </h2>
 
