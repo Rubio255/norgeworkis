@@ -4,6 +4,7 @@ import {
 } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createHmac } from "crypto";
+import { pranestiApieNaujaAnketa } from "@/utils/telegram";
 
 export const runtime = "nodejs";
 
@@ -677,6 +678,10 @@ export async function POST(
       | number
       | null = null;
 
+    let darboPavadinimas:
+      | string
+      | null = null;
+
     if (darbasIdRaw) {
       const parsedId =
         Number(
@@ -705,7 +710,7 @@ export async function POST(
         error: darbasError,
       } = await supabase
         .from("darbai")
-        .select("id")
+        .select("id, pavadinimas")
         .eq("id", parsedId)
         .eq("aktyvus", true)
         .maybeSingle();
@@ -740,6 +745,9 @@ export async function POST(
       }
 
       darbasId = parsedId;
+
+      darboPavadinimas =
+        darbas.pavadinimas || null;
     }
 
     const cvEntry =
@@ -926,6 +934,19 @@ export async function POST(
         }
       );
     }
+
+    await pranestiApieNaujaAnketa({
+      vardas,
+      pavarde,
+      telefonas,
+      email,
+      profesija,
+      patirtis,
+      norveguKalba,
+      angluKalba,
+      darboPavadinimas,
+      turiCv: Boolean(cvPath),
+    });
 
     return NextResponse.json({
       success: true,
