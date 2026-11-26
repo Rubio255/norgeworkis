@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function LegalFooter() {
   return (
-    <footer className="border-t border-line bg-surface px-6 py-10">
+    <footer className="glass border-x-0 border-b-0 px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap gap-x-8 gap-y-4 text-sm">
           <Link

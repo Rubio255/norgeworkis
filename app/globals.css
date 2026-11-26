@@ -69,3 +69,95 @@ body {
 h1, h2, h3, h4 { font-family: var(--font-display), system-ui, sans-serif; text-wrap: balance; letter-spacing: -0.01em; }
 
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Stiklas ir judesys ---------- */
+
+/* Judantis spalvotas fonas po permatomais elementais */
+.ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.ambient span { position: absolute; border-radius: 999px; filter: blur(70px); opacity: .75; will-change: transform; }
+.ambient span:nth-child(1) { width: 46vmax; height: 46vmax; left: -12vmax; top: -10vmax; background: radial-gradient(circle at 30% 30%, #5fc2b4, transparent 65%); animation: drift-a 26s ease-in-out infinite alternate; }
+.ambient span:nth-child(2) { width: 38vmax; height: 38vmax; right: -10vmax; top: 20vh; background: radial-gradient(circle at 50% 50%, #f2b705, transparent 65%); opacity: .35; animation: drift-b 32s ease-in-out infinite alternate; }
+.ambient span:nth-child(3) { width: 50vmax; height: 50vmax; left: 20vw; bottom: -25vmax; background: radial-gradient(circle at 50% 50%, #7aa2ff, transparent 65%); opacity: .3; animation: drift-c 38s ease-in-out infinite alternate; }
+@media (prefers-color-scheme: dark) { .ambient span { opacity: .28; } .ambient span:nth-child(2) { opacity: .16; } }
+@keyframes drift-a { to { transform: translate(18vw, 14vh) scale(1.15); } }
+@keyframes drift-b { to { transform: translate(-22vw, 30vh) scale(.9); } }
+@keyframes drift-c { to { transform: translate(-16vw, -18vh) scale(1.1); } }
+
+/* Permatoma stiklinė kortelė */
+.glass {
+  background: color-mix(in srgb, var(--surface) 52%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid rgb(255 255 255 / .6);
+  box-shadow: 0 8px 32px rgb(23 35 60 / .08), inset 0 1px 0 rgb(255 255 255 / .7);
+}
+.glass-soft {
+  background: color-mix(in srgb, var(--surface) 45%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / .5);
+}
+.glass-dark {
+  background: rgb(255 255 255 / .08);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgb(255 255 255 / .16);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .12);
+}
+@media (prefers-color-scheme: dark) {
+  .glass { border-color: rgb(255 255 255 / .08); box-shadow: 0 8px 32px rgb(0 0 0 / .35), inset 0 1px 0 rgb(255 255 255 / .06); }
+  .glass-soft { border-color: rgb(255 255 255 / .07); }
+}
+
+.glass-chip { background: rgb(8 30 27 / .72); }
+
+/* Atsiradimas iš apačios */
+.reveal { animation: rise .7s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(22px) scale(.98); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+
+/* Plaukiojimas */
+.float { animation: float 6s ease-in-out infinite; }
+.float-slow { animation: float 9s ease-in-out infinite; }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+/* Pulsuojantis taškas */
+.pulse-dot { position: relative; }
+.pulse-dot::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: inherit; animation: ping 1.8s cubic-bezier(0,0,.2,1) infinite; }
+@keyframes ping { 75%, 100% { transform: scale(2.6); opacity: 0; } }
+
+/* Blizgesys per mygtuką */
+.shine { position: relative; overflow: hidden; isolation: isolate; }
+.shine::after { content: ""; position: absolute; inset: -50% auto -50% -60%; width: 40%; transform: skewX(-20deg); background: linear-gradient(90deg, transparent, rgb(255 255 255 / .65), transparent); animation: sweep 3.6s ease-in-out infinite; z-index: -1; pointer-events: none; }
+@keyframes sweep { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+
+/* Kortelė: pakyla ir šviesa seka žymeklį */
+.lift { transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s; }
+.lift:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgb(15 76 69 / .18), inset 0 1px 0 rgb(255 255 255 / .7); }
+.spotlight { position: relative; }
+.spotlight::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s; background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgb(95 194 180 / .18), transparent 45%); }
+.spotlight:hover::before { opacity: 1; }
+
+/* Besisukantis spalvotas rėmelis (vaizdo įrašui) */
+.ring-glow { position: relative; padding: 2px; border-radius: 22px; background: conic-gradient(from var(--angle, 0deg), #5fc2b4, #f2b705, #7aa2ff, #5fc2b4); animation: spin-angle 8s linear infinite; }
+@property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+@keyframes spin-angle { to { --angle: 360deg; } }
+
+/* Ikonėlės: spalvoti gradientiniai „orbai“ su blizgesiu */
+.orb { position: relative; display: grid; place-items: center; flex: none; color: #fff; border-radius: 16px; background: linear-gradient(135deg, var(--o1), var(--o2)); box-shadow: 0 8px 18px -6px var(--o2), inset 0 1px 0 rgb(255 255 255 / .45), inset 0 -6px 12px rgb(0 0 0 / .12); transition: transform .4s cubic-bezier(.3,1.6,.5,1); }
+.orb::before { content: ""; position: absolute; inset: 2px 2px 50% 2px; border-radius: 14px 14px 40% 40%; background: linear-gradient(rgb(255 255 255 / .38), transparent); pointer-events: none; }
+.orb svg { position: relative; filter: drop-shadow(0 1px 1px rgb(0 0 0 / .2)); }
+.group:hover .orb, .orb:hover { transform: rotate(-8deg) scale(1.08); }
+.orb-teal   { --o1: #3fb8a6; --o2: #0f4c45; }
+.orb-gold   { --o1: #ffd84d; --o2: #e09a00; color: #3a2a00; }
+.orb-violet { --o1: #a78bfa; --o2: #6d28d9; }
+.orb-sky    { --o1: #60a5fa; --o2: #1d4ed8; }
+.orb-rose   { --o1: #fb7185; --o2: #be123c; }
+.orb-lime   { --o1: #86efac; --o2: #15803d; }
+.orb-amber  { --o1: #fdba74; --o2: #c2410c; }
+.orb-slate  { --o1: #94a3b8; --o2: #334155; }
+.orb-spark::after { content: ""; position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 999px; background: #f2b705; box-shadow: 0 0 0 3px var(--surface), 0 0 12px #f2b705; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient span, .reveal, .float, .float-slow, .pulse-dot::after, .shine::after, .ring-glow { animation: none !important; }
+  .lift, .orb { transition: none; }
+}

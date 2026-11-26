@@ -10,7 +10,7 @@ export const metadata = {
 export default function PrivatumoPolitikaPage() {
   return (
     <>
-      <main className="min-h-screen bg-page px-6 py-12">
+      <main className="min-h-screen px-6 py-12">
         <article className="mx-auto max-w-4xl rounded-[20px] border border-line bg-surface p-8 shadow-card md:p-12">
           <NorgeworkisLogo />
 
@@ -35,7 +35,7 @@ export default function PrivatumoPolitikaPage() {
                 Įmonių veiklos analizė, MB.
               </p>
 
-              <div className="mt-4 rounded-xl bg-surface-2 p-5">
+              <div className="mt-4 rounded-xl bg-surface-2/60 p-5">
                 <p>
                   <strong>Įmonių veiklos analizė, MB</strong>
                 </p>
@@ -301,7 +301,7 @@ export default function PrivatumoPolitikaPage() {
               </p>
             </section>
 
-            <section className="rounded-xl border border-line bg-surface-2 p-6">
+            <section className="rounded-xl border border-line bg-surface-2/60 p-6">
               <h2 className="text-xl font-bold text-fg">
                 Kontaktai dėl asmens duomenų
               </h2>

@@ -108,6 +108,12 @@ export default function RootLayout({
   return (
     <html lang="lt">
       <body className={`${display.variable} ${body.variable} antialiased`}>
+        <div aria-hidden="true" className="ambient">
+          <span />
+          <span />
+          <span />
+        </div>
+
         {children}
 
         <Script
